@@ -76,7 +76,11 @@ public:
 	void wait()
 	{
 		std::unique_lock<std::mutex> lk(m);
-		complete_event.wait(lk, [&]() { return completion_counter == tasks.size(); });
+		complete_event.wait(lk, [&]() { return completed(); });
+	}
+	bool completed() const
+	{
+		return completion_counter == tasks.size();
 	}
 private:
 	void task_wrapper(std::function<void()> fn)
