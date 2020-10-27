@@ -119,6 +119,7 @@ public:
 			pool[n].id = n;
 			pool[n].is_busy = false;
 			pool[n].t = std::thread(std::bind(&thread_pool::worker_loop, this, std::ref(pool[n])));
+			pool[n].t.detach();
 		}
 	}
 	template<typename Fn, typename ...Args>
@@ -159,6 +160,8 @@ public:
 	void release()
 	{
 		isRunning = false;
+		for (worker& x : pool)
+			x.waiter.notify_one();
 	}
 	~thread_pool()
 	{
@@ -187,7 +190,7 @@ private:
 			self.is_busy = false;
 
 			std::unique_lock<std::mutex> lk(self.m);
-			self.waiter.wait(lk, [&] { return self.task; });
+			self.waiter.wait(lk, [&] { return self.task || !isRunning; });
 		}
 	}
 
