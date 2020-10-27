@@ -26,7 +26,9 @@ bool is_busy()
 ```cpp
 uint64_t executed_tasks() const
 ```
- 
+```cpp
+uint64_t size() const
+```
 ```cpp
 void release()
 ```
@@ -47,6 +49,9 @@ void append(Fn fn, Args ...args)
 ```
 ```cpp
 void wait()
+```
+```cpp
+bool completed() const
 ```
 
 ## timer
