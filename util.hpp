@@ -58,7 +58,9 @@ private:
 	mutable std::mutex m;
 	std::queue<T> queue;
 };
-
+/**
+ * task_package
+ */
 class task_package
 {
 	friend class thread_pool;
