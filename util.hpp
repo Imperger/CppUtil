@@ -157,6 +157,10 @@ public:
 	{
 		return task_counter;
 	}
+	uint64_t size() const
+	{
+		return pool.size();
+	}
 	void release()
 	{
 		isRunning = false;
