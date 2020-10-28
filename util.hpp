@@ -161,6 +161,10 @@ public:
 	{
 		return pool.size();
 	}
+	uint64_t queue_length() const
+	{
+		return waitList.size();
+	}
 	void release()
 	{
 		isRunning = false;

@@ -30,6 +30,9 @@ uint64_t executed_tasks() const
 uint64_t size() const
 ```
 ```cpp
+uint64_t queue_length() const
+```
+```cpp
 void release()
 ```
  
