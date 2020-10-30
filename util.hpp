@@ -225,7 +225,54 @@ private:
 	threadsafe_queue<std::function<void()>> waitList;
 	std::atomic<uint64_t> task_counter = 0;
 };
+/*
+ * parallel_map 
+ */
+template<typename Container>
+class parallel_map
+{
+	using value_type = typename Container::value_type;
+	using transform_type = std::function<value_type(const value_type&)>;
+	using iterator = typename Container::iterator;
+public:
+	explicit parallel_map(Container& target, thread_pool& pool): target(&target), pool(&pool) {}
+	template<typename Fn, typename ...Args>
+	parallel_map& map(Fn fn, Args ...args)
+	{
+		transformList.push_back(std::bind(fn, std::placeholders::_1, args...));
+		return *this;
+	}
+	void run()
+	{
+		auto chunk_size = target->size() / pool->size();
+		for (auto begin = target->begin(); begin < target->end(); std::advance(begin, chunk_size))
+		{
+			auto end = begin + chunk_size;
+			if (end > target->end())
+				end = target->end();
 
+			pkg.append([this, begin, end]()
+				{
+					for (auto x : transformList)
+					{
+						std::transform(begin, end, begin, x);
+					}
+				});
+		}
+
+		pool->schedule(pkg);
+	}
+	void wrun()
+	{
+		run();
+		pkg.wait();
+	}
+private:
+	Container* target;
+	thread_pool* pool;
+	task_package pkg;
+	std::vector<transform_type> transformList;
+};
 /**
  * timer class
  */

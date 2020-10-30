@@ -39,7 +39,26 @@ void release()
 ```cpp
 ~thread_pool()
 ```
+## parallel_map
 
+```cpp
+template<typename Container>
+class parallel_map
+```
+---
+```cpp
+explicit parallel_map(Container& target, thread_pool& pool): target(&target), pool(&pool) {}
+```
+```cpp
+template<typename Fn, typename ...Args>
+parallel_map& map(Fn fn, Args ...args)
+```
+```cpp
+void run()
+```
+```cpp
+void wrun()
+```
 ## task_package
 
 ```cpp
