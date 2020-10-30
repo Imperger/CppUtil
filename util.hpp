@@ -7,6 +7,7 @@
 #include <chrono>
 #include <atomic>
 #include <mutex>
+#include <shared_mutex>
 #include <thread>
 #include <condition_variable>
 #include <ratio>
@@ -25,18 +26,18 @@ class threadsafe_queue
 public:
 	void push(const T& val)
 	{
-		std::lock_guard<std::mutex> lk(m);
+		std::lock_guard<std::shared_mutex> lk(m);
 		queue.push(val);
 	}
 	T pop()
 	{
-		std::lock_guard<std::mutex> lk(m);
+		std::lock_guard<std::shared_mutex> lk(m);
 		T val = queue.front(); queue.pop();
 		return val;
 	}
 	std::optional<T> try_pop()
 	{
-		std::lock_guard<std::mutex> lk(m);
+		std::lock_guard<std::shared_mutex> lk(m);
 
 		if (queue.empty())
 			return {};
@@ -46,16 +47,16 @@ public:
 	}
 	bool empty() const
 	{
-		std::lock_guard<std::mutex> lk(m);
+		std::shared_lock<std::shared_mutex> lk(m);
 		return queue.empty();
 	}
 	size_t size() const
 	{
-		std::lock_guard<std::mutex> lk(m);
+		std::shared_lock<std::shared_mutex> lk(m);
 		return queue.size();
 	}
 private:
-	mutable std::mutex m;
+	mutable std::shared_mutex m;
 	std::queue<T> queue;
 };
 /**
@@ -119,7 +120,6 @@ public:
 			pool[n].id = n;
 			pool[n].is_busy = false;
 			pool[n].t = std::thread(std::bind(&thread_pool::worker_loop, this, std::ref(pool[n])));
-			pool[n].t.detach();
 		}
 	}
 	template<typename Fn, typename ...Args>
@@ -169,7 +169,10 @@ public:
 	{
 		isRunning = false;
 		for (worker& x : pool)
+		{
 			x.waiter.notify_one();
+			x.t.join();
+		}
 	}
 	~thread_pool()
 	{
@@ -200,6 +203,10 @@ private:
 			std::unique_lock<std::mutex> lk(self.m);
 			self.waiter.wait(lk, [&] { return self.task || !isRunning; });
 		}
+
+#ifdef _DEBUG
+		std::cout << "Thread " << self.id << " exited\n";
+#endif
 	}
 
 	std::optional<worker*> find_free_worker()
