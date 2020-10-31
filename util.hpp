@@ -14,7 +14,7 @@
 #include <vector>
 #include <queue>
 #include <stdexcept>
-
+#include <cstdint>
 namespace util
 {
 /*
@@ -226,7 +226,7 @@ private:
 	std::atomic<uint64_t> task_counter = 0;
 };
 /*
- * parallel_map 
+ * parallel_map
  */
 template<typename Container>
 class parallel_map
@@ -235,7 +235,7 @@ class parallel_map
 	using transform_type = std::function<value_type(const value_type&)>;
 	using iterator = typename Container::iterator;
 public:
-	explicit parallel_map(Container& target, thread_pool& pool): target(&target), pool(&pool) {}
+	explicit parallel_map(Container& target, thread_pool& pool) : target(&target), pool(&pool) {}
 	template<typename Fn, typename ...Args>
 	parallel_map& map(Fn fn, Args ...args)
 	{
@@ -252,12 +252,12 @@ public:
 				end = target->end();
 
 			pkg.append([this, begin, end]()
+			{
+				for (auto x : transformList)
 				{
-					for (auto x : transformList)
-					{
-						std::transform(begin, end, begin, x);
-					}
-				});
+					std::transform(begin, end, begin, x);
+				}
+			});
 		}
 
 		pool->schedule(pkg);
@@ -326,6 +326,73 @@ private:
 
 using random_int_iterator = random_iterator<int, std::mt19937, std::uniform_int_distribution<int>>;
 using random_double_iterator = random_iterator<double, std::mt19937, std::uniform_real_distribution<double>>;
+/**
+ * utf8_iterator class
+ */
+template<typename Iterator>
+class utf8_iterator
+{
+public:
+	utf8_iterator(Iterator it) : it(it) {}
+	utf8_iterator& operator++()
+	{
+		it += cp_len();
+		return *this;
+	}
+	char32_t operator*()
+	{
+		
+		uint8_t cp_size = cp_len();
+		char32_t cp = 0;
+
+		switch (cp_size)
+		{
+		case 1:
+			cp = *it;
+			break;
+		case 2:
+			cp |= *it & 0x1F;
+			break;
+		case 3:
+			cp |= *it & 0xF;
+			break;
+		case 4:
+			cp |= *it & 0x3;
+			break;
+		}
+
+		for (auto cp_it = std::next(it); std::distance(it, cp_it) < cp_size; ++cp_it)
+		{
+			cp <<= 6;
+			cp |= *cp_it & 0x3F;
+		}
+
+		return cp;
+	}
+	bool operator!=(Iterator r) const
+	{
+		return it != r;
+	}
+private:
+	uint8_t cp_len() const
+	{
+		uint8_t cp_size;
+		if ((*it & 0x80) == 0)          // lead bit is zero, must be a single ascii
+			cp_size = 1;
+		else if ((*it & 0xE0) == 0xC0)  // 110x xxxx
+			cp_size = 2;
+		else if ((*it & 0xF0) == 0xE0) // 1110 xxxx
+			cp_size = 3;
+		else if ((*it & 0xF8) == 0xF0) // 1111 0xxx
+			cp_size = 4;
+		else
+			throw std::runtime_error("Invalid cp");
+
+		return cp_size;
+	}
+private:
+	Iterator it;
+};
 
 template<typename Container, typename T = typename Container::value_type>
 std::istream& operator>>(std::istream& is, Container& x)

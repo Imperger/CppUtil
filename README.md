@@ -109,6 +109,25 @@ random_iterator& operator++()
 const T& operator*()
 ```
 
+## utf8_iterator
+```cpp
+template<typename Iterator>
+class utf8_iterator
+```
+---
+```cpp
+utf8_iterator(Iterator it) : it(it) {}
+```
+```cpp
+utf8_iterator& operator++()
+```
+```cpp
+char32_t operator*()
+```
+```cpp
+bool operator!=(Iterator r) const
+```
+
 ## IO overloads for containers
 
 ```cpp
