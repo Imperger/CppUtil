@@ -376,19 +376,16 @@ public:
 private:
 	uint8_t cp_len() const
 	{
-		uint8_t cp_size;
 		if ((*it & 0x80) == 0)          // lead bit is zero, must be a single ascii
-			cp_size = 1;
+			return 1;
 		else if ((*it & 0xE0) == 0xC0)  // 110x xxxx
-			cp_size = 2;
+			return 2;
 		else if ((*it & 0xF0) == 0xE0) // 1110 xxxx
-			cp_size = 3;
+			return 3;
 		else if ((*it & 0xF8) == 0xF0) // 1111 0xxx
-			cp_size = 4;
+			return 4;
 		else
 			throw std::runtime_error("Invalid cp");
-
-		return cp_size;
 	}
 private:
 	Iterator it;
