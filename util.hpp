@@ -237,12 +237,18 @@ class parallel_map
 public:
 	explicit parallel_map(Container& target, thread_pool& pool) : target(&target), pool(&pool) {}
 	template<typename Fn, typename ...Args>
-	parallel_map& map(Fn fn, Args ...args)
+	parallel_map& map(Fn fn, Args ...args) &
 	{
 		transformList.push_back(std::bind(fn, std::placeholders::_1, args...));
 		return *this;
 	}
-	void run()
+	template<typename Fn, typename ...Args>
+	parallel_map&& map(Fn fn, Args ...args) &&
+	{
+		transformList.push_back(std::bind(fn, std::placeholders::_1, args...));
+		return std::forward<parallel_map>(*this);
+	}
+	void run() &
 	{
 		auto chunk_size = target->size() / pool->size();
 		for (auto begin = target->begin(); begin < target->end(); std::advance(begin, chunk_size))
