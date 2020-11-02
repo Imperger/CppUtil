@@ -77,7 +77,7 @@ public:
 	void wait()
 	{
 		std::unique_lock<std::mutex> lk(m);
-		complete_event.wait(lk, [&]() { return completed(); });
+		complete_event.wait(lk, [&] { return completed(); });
 	}
 	bool completed() const
 	{
@@ -119,7 +119,7 @@ public:
 		{
 			pool[n].id = n;
 			pool[n].is_busy = false;
-			pool[n].t = std::thread(std::bind(&thread_pool::worker_loop, this, std::ref(pool[n])));
+			pool[n].t = std::thread(&thread_pool::worker_loop, this, std::ref(pool[n]));
 		}
 	}
 	template<typename Fn, typename ...Args>
