@@ -35,7 +35,9 @@ uint64_t queue_length() const
 ```cpp
 void release()
 ```
- 
+```cpp
+void join()
+```
 ```cpp
 ~thread_pool()
 ```
@@ -160,5 +162,31 @@ std::optional<T> try_pop()
 bool empty() const
 ```
 ```cpp 
+size_t size() const
+```
+
+## threadsafe_priority_queue
+
+```cpp
+template<typename T>
+class threadsafe_priority_queue
+```
+---
+```cpp
+void push(const T& val)
+```
+```cpp
+T pop()
+```
+```cpp
+std::optional<T> try_pop()
+```
+```cpp
+T& top()
+```
+```cpp
+bool empty() const
+```
+```cpp
 size_t size() const
 ```
