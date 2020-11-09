@@ -111,6 +111,28 @@ random_iterator& operator++()
 const T& operator*()
 ```
 
+## random_string
+```cpp
+template<typename T>
+class random_string
+```
+---
+```cpp
+explicit random_string(const T& dict)
+```
+```cpp
+T operator()(size_t length)
+```
+```cpp
+static random_string hex();
+```
+```cpp
+static random_string digits();
+```
+```cpp
+static random_string alphabet();
+```
+
 ## utf8_iterator
 ```cpp
 template<typename Iterator>
