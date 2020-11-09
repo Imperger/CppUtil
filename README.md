@@ -108,6 +108,9 @@ explicit random_iterator(Args... args)
 random_iterator& operator++()
 ```
 ```cpp
+random_iterator operator++(int)
+```
+```cpp
 const T& operator*()
 ```
 

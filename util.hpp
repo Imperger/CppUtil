@@ -368,6 +368,14 @@ public:
 		val = distrib(gen);
 		return *this;
 	}
+	random_iterator operator++(int)
+	{
+		auto ret = *this;
+
+		++*this;
+
+		return ret;
+	}
 	const T& operator*()
 	{
 		return val;
