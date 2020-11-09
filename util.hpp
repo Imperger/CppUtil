@@ -368,6 +368,14 @@ public:
 		val = distrib(gen);
 		return *this;
 	}
+	random_iterator operator++(int)
+	{
+		auto ret = *this;
+
+		++*this;
+
+		return ret;
+	}
 	const T& operator*()
 	{
 		return val;
@@ -382,6 +390,40 @@ private:
 
 using random_int_iterator = random_iterator<int, std::mt19937, std::uniform_int_distribution<int>>;
 using random_double_iterator = random_iterator<double, std::mt19937, std::uniform_real_distribution<double>>;
+/*
+ * random_string
+ */
+template<typename T>
+class random_string
+{
+public:
+	explicit random_string(const T& dict): dict(dict) {}
+	T operator()(size_t length)
+	{
+		T ret(length, 0);
+		random_int_iterator rnd(0, dict.size() - 1);
+
+		std::generate(ret.begin(), ret.end(), [&] { return dict[*rnd++]; });
+
+		return ret;
+	}
+public:
+	static random_string hex();
+	static random_string digits();
+	static random_string alphabet();
+private:
+	T dict;
+};
+
+random_string<std::string> random_string<std::string>::hex() { return random_string<std::string>("0123456789abcdef"); };
+random_string<std::wstring> random_string<std::wstring>::hex() { return random_string<std::wstring>(L"0123456789abcdef"); };
+
+random_string<std::string> random_string<std::string>::digits() { return random_string<std::string>("0123456789"); };
+random_string<std::wstring> random_string<std::wstring>::digits() { return random_string<std::wstring>(L"0123456789"); };
+
+random_string<std::string> random_string<std::string>::alphabet() { return random_string<std::string>("abcdefghijklmnopqrstuvwxyz"); };
+random_string<std::wstring> random_string<std::wstring>::alphabet() { return random_string<std::wstring>(L"abcdefghijklmnopqrstuvwxyz"); };
+
 /**
  * utf8_iterator class
  */
