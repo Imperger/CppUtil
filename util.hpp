@@ -389,6 +389,7 @@ private:
 };
 
 using random_int_iterator = random_iterator<int, std::mt19937, std::uniform_int_distribution<int>>;
+using random_uint_iterator = random_iterator<uint64_t, std::mt19937, std::uniform_int_distribution<uint64_t>>;
 using random_double_iterator = random_iterator<double, std::mt19937, std::uniform_real_distribution<double>>;
 /*
  * random_string
@@ -401,7 +402,7 @@ public:
 	T operator()(size_t length)
 	{
 		T ret(length, 0);
-		random_int_iterator rnd(0, dict.size() - 1);
+		random_uint_iterator rnd(0, dict.size() - 1);
 
 		std::generate(ret.begin(), ret.end(), [&] { return dict[*rnd++]; });
 
