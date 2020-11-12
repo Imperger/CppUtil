@@ -402,7 +402,7 @@ public:
 	T operator()(size_t length)
 	{
 		T ret(length, 0);
-		random_int_iterator rnd(0, dict.size() - 1);
+		random_uint_iterator rnd(0, dict.size() - 1);
 
 		std::generate(ret.begin(), ret.end(), [&] { return dict[*rnd++]; });
 
