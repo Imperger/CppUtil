@@ -18,6 +18,83 @@
 namespace util
 {
 /*
+ * matrix
+ */
+template<typename T>
+class matrix
+{
+	class row_holder
+	{
+	public:
+		explicit row_holder(std::size_t m, matrix& mt) : m(m), mt(mt) {}
+		T& operator[](std::size_t n) { return mt.data[m * mt.m + n]; }
+	private:
+		std::size_t m;
+		matrix& mt;
+	};
+	class const_row_holder
+	{
+	public:
+		explicit const_row_holder(std::size_t m, const matrix& mt) : m(m), mt(mt) {}
+		const T& operator[](std::size_t n) const { return mt.data[m * mt.m + n]; }
+	private:
+		std::size_t m;
+		const matrix& mt;
+	};
+public:
+	explicit matrix(std::size_t m, std::size_t n) : m(m), n(n), data(m * n) {}
+	row_holder operator[](std::size_t idx)
+	{
+		return row_holder(idx, *this);
+	}
+	const_row_holder operator[](std::size_t idx) const
+	{
+		return const_row_holder(idx, *this);
+	}
+	T determinant() const
+	{
+		if (m != n)
+			throw std::runtime_error("Determinant operation available only on square matrix");
+
+		return calc_determinant(*this);
+	}
+private:
+	static T calc_determinant(const matrix& m)
+	{
+		int det = 0;
+		if (m.m == 1)
+		{
+			return m[0][0];
+		}
+		else if (m.m == 2)
+		{
+			return m[0][0] * m[1][1] - m[0][1] * m[1][0];
+		}
+		else
+		{
+			for (int p = 0; p < m.m; p++)
+			{
+				matrix temp(m.m - 1, m.n - 1);
+
+				for (std::size_t n = m.n, i = 0; n < m.data.size(); ++n)
+				{
+					if (n % m.n == p)
+						continue;
+
+					temp.data[i++] = m.data[n];
+				}
+
+				det = det + m[0][p] * pow(-1, p) * calc_determinant(temp);
+			}
+			return det;
+		}
+	}
+private:
+	uint64_t m;
+	uint64_t n;
+	std::vector<T> data;
+};
+/*
  * threadsafe_queue
  */
 template<typename T>
