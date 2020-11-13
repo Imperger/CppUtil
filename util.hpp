@@ -61,7 +61,6 @@ public:
 private:
 	static T calc_determinant(const matrix& m)
 	{
-		int det = 0;
 		if (m.m == 1)
 		{
 			return m[0][0];
@@ -72,6 +71,7 @@ private:
 		}
 		else
 		{
+			T det = 0;
 			for (int p = 0; p < m.m; p++)
 			{
 				matrix temp(m.m - 1, m.n - 1);
@@ -84,14 +84,14 @@ private:
 					temp.data[i++] = m.data[n];
 				}
 
-				det = det + m[0][p] * pow(-1, p) * calc_determinant(temp);
+				det += m[0][p] * pow(-1, p) * calc_determinant(temp);
 			}
 			return det;
 		}
 	}
 private:
-	uint64_t m;
-	uint64_t n;
+	std::size_t m;
+	std::size_t n;
 	std::vector<T> data;
 };
 /*
