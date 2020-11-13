@@ -1,5 +1,24 @@
 # CppUtil
 
+## matrix
+
+```cpp
+template<typename T>
+class matrix
+```
+```cpp
+explicit matrix(std::size_t m, std::size_t n)
+```
+```cpp
+row_holder operator[](std::size_t idx)
+```
+```cpp
+const_row_holder operator[](std::size_t idx) const
+```
+```cpp
+T determinant() const
+```
+
 ## thread_pool
 
 ```cpp
