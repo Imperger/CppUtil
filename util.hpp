@@ -43,6 +43,18 @@ class matrix
 	};
 public:
 	explicit matrix(std::size_t m, std::size_t n) : m(m), n(n), data(m * n) {}
+	template<size_t M, size_t N>
+	explicit matrix(const T(&mtx)[M][N]): m(M), n(N)
+	{
+		data.reserve(m * n);
+		for (std::size_t m = 0; m < M; ++m)
+		{
+			for (std::size_t n = 0; n < N; ++n)
+			{
+				data.push_back(mtx[m][n]);
+			}
+		}
+	}
 	row_holder operator[](std::size_t idx)
 	{
 		return row_holder(idx, *this);
