@@ -43,8 +43,8 @@ class matrix
 	};
 public:
 	explicit matrix(std::size_t m, std::size_t n) : m(m), n(n), data(m * n) {}
-	template<size_t M, size_t N>
-	explicit matrix(const T(&mtx)[M][N]): m(M), n(N)
+	template<typename Type, size_t M, size_t N>
+	explicit matrix(const Type(&mtx)[M][N]): m(M), n(N)
 	{
 		data.reserve(m * n);
 		for (std::size_t m = 0; m < M; ++m)
@@ -106,6 +106,7 @@ private:
 	std::size_t n;
 	std::vector<T> data;
 };
+template<typename Type, size_t M, size_t N> matrix(const Type(&mtx)[M][N]) -> matrix<Type>;
 /*
  * threadsafe_queue
  */

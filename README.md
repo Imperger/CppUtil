@@ -10,8 +10,8 @@ class matrix
 explicit matrix(std::size_t m, std::size_t n)
 ```
 ```cpp
-template<size_t M, size_t N>
-explicit matrix(const T(&mtx)[M][N])
+template<typename Type, size_t M, size_t N>
+explicit matrix(const Type(&mtx)[M][N]): m(M), n(N)
 ```
 ```cpp
 row_holder operator[](std::size_t idx)
