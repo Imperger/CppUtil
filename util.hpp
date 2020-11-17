@@ -17,6 +17,46 @@
 #include <cstdint>
 namespace util
 {
+template<typename It>
+struct max_subarray_result
+{
+	It begin;
+	It end;
+	typename It::value_type sum;
+};
+/*
+ * max_subarray_sum
+ */
+template<typename It>
+max_subarray_result<It> max_subarray_sum(It begin, It end)
+{
+	if (begin == end)
+		return { begin, end, 0 };
+
+	It second = std::next(begin);
+	max_subarray_result<It> best{ begin, second, *begin };
+	for (max_subarray_result<It> cur = best; cur.end != end; ++cur.end)
+	{
+		if (cur.sum <= 0)
+		{
+			cur.begin = cur.end;
+			cur.sum = *cur.end;
+		}
+		else
+		{
+			cur.sum += *cur.end;
+		}
+
+		if (cur.sum > best.sum)
+		{
+			best.begin = cur.begin;
+			best.end = std::next(cur.end);
+			best.sum = cur.sum;
+		}
+	}
+
+	return best;
+}
 /*
  * matrix
  */
@@ -588,6 +628,9 @@ std::istream& operator>>(std::istream& is, Container& x)
 
 	return is;
 }
+#ifndef PRINT_LENGTH_LIMIT
+#define PRINT_LENGTH_LIMIT 15
+#endif // !PRINT_LENGTH_LIMIT
 
 template<typename Container, typename T = typename Container::value_type>
 std::ostream& operator<<(std::ostream& os, const Container& x)
@@ -600,7 +643,16 @@ std::ostream& operator<<(std::ostream& os, const Container& x)
 
 	os << '[';
 	auto last = std::prev(x.end());
-	std::copy(x.begin(), last, std::ostream_iterator<T>(os, ", "));
+	if (x.size() > PRINT_LENGTH_LIMIT)
+	{
+		auto h = std::min<size_t>(x.size(), PRINT_LENGTH_LIMIT) - 1;
+		std::copy_n(x.begin(), h, std::ostream_iterator<T>(os, ", "));
+		std::cout << "..., ";
+	}
+	else
+	{
+		std::copy(x.begin(), last, std::ostream_iterator<T>(os, ", "));
+	}
 	os << *last << ']';
 
 	return os;

@@ -1,5 +1,21 @@
 # CppUtil
 
+## max_subarray_sum
+
+```cpp
+template<typename It>
+max_subarray_result<It> max_subarray_sum(It begin, It end)
+```
+```cpp
+template<typename It>
+struct max_subarray_result
+{
+	It begin;
+	It end;
+	typename It::value_type sum;
+};
+```
+
 ## matrix
 
 ```cpp
