@@ -628,6 +628,9 @@ std::istream& operator>>(std::istream& is, Container& x)
 
 	return is;
 }
+#ifndef PRINT_LENGTH_LIMIT
+#define PRINT_LENGTH_LIMIT 15
+#endif // !PRINT_LENGTH_LIMIT
 
 template<typename Container, typename T = typename Container::value_type>
 std::ostream& operator<<(std::ostream& os, const Container& x)
@@ -640,7 +643,16 @@ std::ostream& operator<<(std::ostream& os, const Container& x)
 
 	os << '[';
 	auto last = std::prev(x.end());
-	std::copy(x.begin(), last, std::ostream_iterator<T>(os, ", "));
+	if (x.size() > PRINT_LENGTH_LIMIT)
+	{
+		auto h = std::min<size_t>(x.size(), PRINT_LENGTH_LIMIT) - 1;
+		std::copy_n(x.begin(), h, std::ostream_iterator<T>(os, ", "));
+		std::cout << "..., ";
+	}
+	else
+	{
+		std::copy(x.begin(), last, std::ostream_iterator<T>(os, ", "));
+	}
 	os << *last << ']';
 
 	return os;
