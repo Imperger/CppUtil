@@ -281,7 +281,7 @@ class thread_pool
 {
 	struct worker
 	{
-		uint64_t id;
+		uint64_t id = 0;
 		std::atomic<bool> is_busy;
 		std::function<void()> task;
 		std::thread t;
