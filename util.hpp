@@ -15,6 +15,10 @@
 #include <queue>
 #include <stdexcept>
 #include <cstdint>
+#include <sstream>
+#ifdef _WIN32
+#include<Windows.h>
+#endif
 namespace util
 {
 template<typename It>
@@ -657,4 +661,55 @@ std::ostream& operator<<(std::ostream& os, const Container& x)
 
 	return os;
 }
+#ifdef _WIN32
+
+class WinCin
+{
+	template<typename T>
+	friend WinCin& operator>>(WinCin& in, T& x);
+
+public:
+	void Init() 
+	{
+		SetConsoleCP(CP_UTF8);
+		cinHandle = GetStdHandle(STD_INPUT_HANDLE);
+	}
+	bool IsInit() const { return cinHandle != INVALID_HANDLE_VALUE; }
+private:
+	void Store(const std::string& str)
+	{
+		stream.write(str.data(), str.size());
+	}
+private:
+	HANDLE cinHandle = INVALID_HANDLE_VALUE;
+	std::stringstream stream;
+};
+
+template<typename T>
+WinCin& operator>>(WinCin& in, T& x)
+{
+	if (!in.IsInit()) in.Init();
+
+	std::vector<char> buffer(1024);
+
+	DWORD read = 0;
+	ReadConsole(in.cinHandle, buffer.data(), static_cast<DWORD>(buffer.size()), &read, NULL);
+
+	DWORD size = WideCharToMultiByte(CP_UTF8, 0, reinterpret_cast<wchar_t*>(buffer.data()), -1, NULL, 0, NULL, NULL);
+	std::string utf8(size, 0);
+
+	WideCharToMultiByte(CP_UTF8, 0, reinterpret_cast<wchar_t*>(buffer.data()), -1, utf8.data(), size, NULL, NULL);
+
+	in.Store(utf8);
+
+	using std::operator>>;
+
+	in.stream >> x;
+
+	return in;
+}
+
+inline WinCin wincin;
+
+#endif // _WIN32
 }
