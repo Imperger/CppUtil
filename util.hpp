@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <cstdint>
 #include <sstream>
+#include <type_traits>
 #ifdef _WIN32
 #include<Windows.h>
 #endif
@@ -624,8 +625,10 @@ private:
 	Iterator it;
 };
 
-template<typename Container, typename T = typename Container::value_type>
-std::istream& operator>>(std::istream& is, Container& x)
+template<typename Container,
+	typename T = typename Container::value_type,
+	std::enable_if_t<!std::is_base_of_v<std::string, Container>, bool> = true>
+	std::istream& operator>>(std::istream& is, Container& x)
 {
 	for (auto it = x.begin(); is.good() && it != x.end(); ++it)
 		is >> *it;
@@ -636,8 +639,10 @@ std::istream& operator>>(std::istream& is, Container& x)
 #define PRINT_LENGTH_LIMIT 15
 #endif // !PRINT_LENGTH_LIMIT
 
-template<typename Container, typename T = typename Container::value_type>
-std::ostream& operator<<(std::ostream& os, const Container& x)
+template<typename Container,
+	typename T = typename Container::value_type,
+	std::enable_if_t<!std::is_base_of_v<std::string, Container>, bool> = true>
+	std::ostream& operator<<(std::ostream& os, const Container& x)
 {
 	if (x.size() == 0)
 	{
