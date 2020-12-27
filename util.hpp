@@ -674,7 +674,7 @@ class WinCin
 	friend WinCin& operator>>(WinCin& in, T& x);
 
 public:
-	void Init() 
+	void Init()
 	{
 		SetConsoleCP(CP_UTF8);
 		cinHandle = GetStdHandle(STD_INPUT_HANDLE);
@@ -683,7 +683,11 @@ public:
 private:
 	void Store(const std::string& str)
 	{
-		stream.write(str.data(), str.size());
+		auto pos = stream.tellg();
+		stream.seekg(0, std::ios::end);
+		std::string temp(stream.tellg() - pos, 0);
+		stream.read(temp.data(), temp.size());
+		stream = std::stringstream(str + temp);
 	}
 private:
 	HANDLE cinHandle = INVALID_HANDLE_VALUE;
@@ -695,19 +699,20 @@ WinCin& operator>>(WinCin& in, T& x)
 {
 	if (!in.IsInit()) in.Init();
 
+	if (in.stream >> x)
+		return in;
+
 	std::vector<char> buffer(1024);
 
 	DWORD read = 0;
 	ReadConsole(in.cinHandle, buffer.data(), static_cast<DWORD>(buffer.size()), &read, NULL);
 
 	DWORD size = WideCharToMultiByte(CP_UTF8, 0, reinterpret_cast<wchar_t*>(buffer.data()), -1, NULL, 0, NULL, NULL);
-	std::string utf8(size, 0);
+	std::string utf8(size - 1, 0);
 
 	WideCharToMultiByte(CP_UTF8, 0, reinterpret_cast<wchar_t*>(buffer.data()), -1, utf8.data(), size, NULL, NULL);
 
 	in.Store(utf8);
-
-	using std::operator>>;
 
 	in.stream >> x;
 
