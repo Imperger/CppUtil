@@ -152,6 +152,48 @@ private:
 };
 template<typename Type, size_t M, size_t N> matrix(const Type(&mtx)[M][N]) -> matrix<Type>;
 /*
+ * fixed_queue
+ */
+template<typename T, size_t N>
+class fixed_queue
+{
+public:
+	bool enqueue(const T& value)
+	{
+		if (full()) return false;
+
+		data[tail] = value;
+		tail = next_n(tail);
+
+		return true;
+	}
+
+	T dequeue()
+	{
+		if (empty())
+			throw std::runtime_error("Queue is empty");
+
+		const T& ret = data[head];
+		head = next_n(head);
+
+		return ret;
+	}
+
+	inline bool empty() const { return head == tail; }
+
+	inline bool full() const { return next_n(tail) == head; }
+
+	inline size_t capacity() const { return data.size() - 1; }
+
+	inline size_t size() const { return head < tail ? tail - head : data.size() - head + tail; }
+private:
+	inline size_t next_n(size_t n) const { return (n + 1) % data.size(); }
+private:
+	size_t head = 0;
+	size_t tail = 0;
+	std::array<T, N + 1> data;
+};
+/*
  * threadsafe_queue
  */
 template<typename T>
