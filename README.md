@@ -205,6 +205,31 @@ std::istream& operator>>(std::istream& is, Container& x)
 template<typename Container, typename T = typename Container::value_type>
 std::ostream& operator<<(std::ostream& os, const Container& x)
 ```
+## fixed_queue
+
+```cpp
+template<typename T, size_t N>
+class fixed_queue
+```
+```cpp
+bool enqueue(const T& value)
+```
+```cpp
+T dequeue()
+```
+```cpp
+inline bool empty() const
+```
+```cpp
+inline bool full() const
+```
+```cpp
+inline size_t capacity() const
+```
+```cpp
+inline size_t size() const
+```
+
 
 ## threadsafe_queue
 
