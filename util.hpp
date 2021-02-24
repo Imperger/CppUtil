@@ -300,7 +300,7 @@ public:
 	void wait()
 	{
 		std::unique_lock<std::mutex> lk(m);
-		complete_event.wait(lk, [&] { return completed(); });
+		complete_event.wait(lk, [this] { return completed(); });
 	}
 	bool completed() const
 	{
@@ -310,12 +310,15 @@ private:
 	void task_wrapper(std::function<void()> fn)
 	{
 		fn();
-		++completion_counter;
+		{
+			std::lock_guard<std::mutex> lk(m);
+			++completion_counter;
+		}
 		complete_event.notify_one();
 	}
 private:
 	std::vector<std::function<void()>> tasks;
-	std::atomic<uint64_t> completion_counter;
+	uint64_t completion_counter = 0;
 	std::condition_variable complete_event;
 	std::mutex m;
 	bool sealed = false;
