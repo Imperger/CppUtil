@@ -1,5 +1,32 @@
 # CppUtil
 
+## mean
+```cpp
+template<typename It>
+inline double mean(It begin, It end)
+```
+
+## median
+
+```cpp
+template<typename It>
+typename double median(It begin, It end)
+```
+
+## variance
+
+```cpp
+template<typename It>
+inline double variance(It begin, It end)
+```
+
+## standard_deviation
+
+```cpp
+template<typename It>
+inline double standard_deviation(It begin, It end)
+```
+
 ## max_subarray_sum
 
 ```cpp

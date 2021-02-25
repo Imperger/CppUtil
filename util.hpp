@@ -17,11 +17,56 @@
 #include <cstdint>
 #include <sstream>
 #include <type_traits>
+#include <numeric>
+#include <cassert>
 #ifdef _WIN32
 #include<Windows.h>
 #endif
 namespace util
 {
+/*
+ * mean
+ */
+template<typename It>
+inline double mean(It begin, It end)
+{
+	assert(begin != end, "Mean of empty set is undefined");
+
+	return std::accumulate(begin, end, 0.0) / std::distance(begin, end);
+}
+/*
+ * median
+ */
+template<typename It>
+typename double median(It begin, It end)
+{
+	assert(begin != end, "Median of empty set is undefined");
+
+	size_t size = std::distance(begin, end);
+
+	std::nth_element(begin, std::next(begin, size / 2), end);
+
+	return size % 2 == 0 ?
+		(*std::next(begin, size / 2 - 1) + *std::next(begin, size / 2)) / 2. :
+		*std::next(begin, size / 2);
+}
+/*
+ * variance
+ */
+template<typename It>
+inline double variance(It begin, It end)
+{
+	double mean = util::mean(begin, end);
+	return std::accumulate(begin, end, 0.0, [&](double acc, double x) { return acc + std::pow(x - mean, 2); }) / static_cast<double>(std::distance(begin, end));
+}
+/*
+ * standard_deviation
+ */
+template<typename It>
+inline double standard_deviation(It begin, It end)
+{
+	return std::sqrt(variance(begin, end));
+}
 template<typename It>
 struct max_subarray_result
 {
