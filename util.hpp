@@ -30,7 +30,7 @@ namespace util
 template<typename It>
 inline double mean(It begin, It end)
 {
-	assert(begin != end, "Mean of empty set is undefined");
+	assert(begin != end && "Mean of empty set is undefined");
 
 	return std::accumulate(begin, end, 0.0) / std::distance(begin, end);
 }
@@ -40,7 +40,7 @@ inline double mean(It begin, It end)
 template<typename It>
 typename double median(It begin, It end)
 {
-	assert(begin != end, "Median of empty set is undefined");
+	assert(begin != end && "Median of empty set is undefined");
 
 	size_t size = std::distance(begin, end);
 
