@@ -159,6 +159,20 @@ uint64_t stop()
 ```cpp
 uint64_t reset()
 ```
+## formaters
+
+```cpp
+void print_memory(const char* mem, size_t size, std::ostream& os, const PrintOptions& opt = { 16, true, true, '.' })
+```
+```cpp
+struct PrintOptions
+{
+	size_t width;
+	bool title;
+	bool ascii;
+	char no_ascii_placeholder;
+};
+```
 
 ## random_iterator
 

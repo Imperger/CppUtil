@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <iomanip>
 #include <algorithm>
 #include <functional>
 #include <optional>
@@ -580,6 +581,54 @@ public:
 private:
 	std::chrono::steady_clock::time_point tm;
 };
+
+struct PrintOptions
+{
+	size_t width;
+	bool title;
+	bool ascii;
+	char no_ascii_placeholder;
+};
+
+void print_memory(const char* mem, size_t size, std::ostream& os, const PrintOptions& opt = { 16, true, true, '.' })
+{
+	const size_t char_size = 3;
+	const size_t hex_scale = 2;
+	std::string ascii_buffer;
+	const char* end = mem + size;
+
+	if (opt.title)
+	{
+		const size_t pad = (opt.width * char_size - sizeof(uintptr_t) * hex_scale) / 2;
+		os << std::setfill(' ') << std::setw(pad + sizeof(uintptr_t) * hex_scale) << static_cast<const void*>(mem) << '\n';
+	}
+
+	for (const char* ptr = mem; ptr < end; ++ptr)
+	{
+		os << std::hex << std::setfill('0') << std::setw(hex_scale) << static_cast<uint16_t>(static_cast<uint8_t>(*ptr)) << ' ';
+
+		if (opt.ascii)
+		{
+			ascii_buffer += *ptr >= ' ' && *ptr <= '~' ? *ptr : opt.no_ascii_placeholder;
+		}
+
+		if ((ptr - mem) % opt.width == opt.width - 1) // new line
+		{
+			if (opt.ascii)
+			{
+				os << " " << ascii_buffer;
+				ascii_buffer.clear();
+			}
+
+			os << '\n';
+		}
+	}
+
+	if (opt.ascii)
+	{
+		os << std::setfill(' ') << std::setw((opt.width - size % opt.width) * char_size + ascii_buffer.size() + 1) << ascii_buffer;
+	}
+}
 
 template<typename T, typename Generator, typename Distribution>
 class random_iterator
