@@ -167,16 +167,16 @@ void random_iterator_test()
 
 void test_utf8_iterator()
 {
-	std::string x = u8"Ïğèâåò";
+	std::string x = u8"ĞŸÑ€Ğ¸Ğ²ĞµÑ‚";
 
 	util::utf8_iterator it(x.begin());
 
-	test(*it == *L"Ï");
-	test(*++it == *L"ğ");
-	test(*++it == *L"è");
-	test(*++it == *L"â");
-	test(*++it == *L"å");
-	test(*++it == *L"ò");
+	test(*it == *L"ĞŸ");
+	test(*++it == *L"Ñ€");
+	test(*++it == *L"Ğ¸");
+	test(*++it == *L"Ğ²");
+	test(*++it == *L"Ğµ");
+	test(*++it == *L"Ñ‚");
 }
 
 void test_print_memory()

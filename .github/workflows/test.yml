@@ -1,0 +1,53 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Msvc",
+            os: "windows-latest",
+            cc: "cl",
+            cxx: "cl",
+          }
+        - {
+          name: "Gcc",
+          os: "ubuntu-latest",
+          cc: "gcc",
+          cxx: "g++",
+          }
+        - {
+          name: "Clang",
+          os: "ubuntu-latest",
+          cc: "clang",
+          cxx: "clang++",
+          }
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure
+        shell: bash
+        run: |
+          mkdir build
+          cmake -S test -B build
+      - name: Build
+        shell: bash
+        run: |
+          cmake --build build --config Release
+      - name: Test msvc
+        if: ${{ matrix.config.name == 'Msvc' }}
+        shell: bash
+        run: ./build/Release/CppUtilTest.exe
+      - name: Test Gcc
+        if: ${{ matrix.config.name == 'Gcc' }}
+        shell: bash
+        run: ./build/CppUtilTest
+      - name: Test Clang
+        if: ${{ matrix.config.name == 'Clang' }}
+        shell: bash
+        run: ./build/CppUtilTest

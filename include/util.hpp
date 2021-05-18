@@ -636,6 +636,12 @@ template<typename T, typename Generator, typename Distribution>
 class random_iterator
 {
 public:
+	using difference_type = std::ptrdiff_t;
+	using value_type = T;
+	using pointer = T*;
+	using reference = T&;
+	using iterator_category = std::forward_iterator_tag;
+public:
 	template<typename ...Args>
 	explicit random_iterator(Args... args) : gen(dev()), distrib(args...), val(distrib(gen)) {};
 	random_iterator(const random_iterator& x) : gen(x.gen), distrib(x.distrib), val(x.val) {};
