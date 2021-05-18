@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <iomanip>
+#include <iterator>
 #include <algorithm>
 #include <functional>
 #include <optional>
@@ -12,6 +13,7 @@
 #include <thread>
 #include <condition_variable>
 #include <ratio>
+#include <array>
 #include <vector>
 #include <queue>
 #include <stdexcept>
@@ -39,7 +41,7 @@ inline double mean(It begin, It end)
  * median
  */
 template<typename It>
-typename double median(It begin, It end)
+double median(It begin, It end)
 {
 	assert(begin != end && "Median of empty set is undefined");
 
@@ -135,7 +137,7 @@ class matrix
 public:
 	explicit matrix(std::size_t m, std::size_t n) : m(m), n(n), data(m * n) {}
 	template<typename Type, size_t M, size_t N>
-	explicit matrix(const Type(&mtx)[M][N]): m(M), n(N)
+	explicit matrix(const Type(&mtx)[M][N]) : m(M), n(N)
 	{
 		data.reserve(m * n);
 		for (std::size_t m = 0; m < M; ++m)
@@ -187,7 +189,7 @@ private:
 					temp.data[i++] = m.data[n];
 				}
 
-				det += m[0][p] * pow(-1, p) * calc_determinant(temp);
+				det += m[0][p] * static_cast<T>(pow(-1, p)) * calc_determinant(temp);
 			}
 			return det;
 		}
@@ -197,7 +199,7 @@ private:
 	std::size_t n;
 	std::vector<T> data;
 };
-template<typename Type, size_t M, size_t N> matrix(const Type(&mtx)[M][N]) -> matrix<Type>;
+template<typename Type, size_t M, size_t N> matrix(const Type(&mtx)[M][N])->matrix<Type>;
 /*
  * fixed_queue
  */
@@ -662,7 +664,7 @@ private:
 	T val;
 };
 
-using random_int_iterator = random_iterator<int, std::mt19937, std::uniform_int_distribution<int>>;
+using random_int_iterator = random_iterator<int64_t, std::mt19937, std::uniform_int_distribution<int64_t>>;
 using random_uint_iterator = random_iterator<uint64_t, std::mt19937, std::uniform_int_distribution<uint64_t>>;
 using random_double_iterator = random_iterator<double, std::mt19937, std::uniform_real_distribution<double>>;
 /*
@@ -672,7 +674,7 @@ template<typename T>
 class random_string
 {
 public:
-	explicit random_string(const T& dict): dict(dict) {}
+	explicit random_string(const T& dict) : dict(dict) {}
 	T operator()(size_t length)
 	{
 		T ret(length, 0);
@@ -690,13 +692,19 @@ private:
 	T dict;
 };
 
+template<>
 random_string<std::string> random_string<std::string>::hex() { return random_string<std::string>("0123456789abcdef"); };
+template<>
 random_string<std::wstring> random_string<std::wstring>::hex() { return random_string<std::wstring>(L"0123456789abcdef"); };
 
+template<>
 random_string<std::string> random_string<std::string>::digits() { return random_string<std::string>("0123456789"); };
+template<>
 random_string<std::wstring> random_string<std::wstring>::digits() { return random_string<std::wstring>(L"0123456789"); };
 
+template<>
 random_string<std::string> random_string<std::string>::alphabet() { return random_string<std::string>("abcdefghijklmnopqrstuvwxyz"); };
+template<>
 random_string<std::wstring> random_string<std::wstring>::alphabet() { return random_string<std::wstring>(L"abcdefghijklmnopqrstuvwxyz"); };
 
 /**
@@ -714,7 +722,7 @@ public:
 	}
 	char32_t operator*()
 	{
-		
+
 		uint8_t cp_size = cp_len();
 		char32_t cp = 0;
 

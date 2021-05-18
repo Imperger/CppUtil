@@ -10,7 +10,7 @@ inline double mean(It begin, It end)
 
 ```cpp
 template<typename It>
-typename double median(It begin, It end)
+double median(It begin, It end)
 ```
 
 ## variance
