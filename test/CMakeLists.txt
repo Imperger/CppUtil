@@ -6,10 +6,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(WIN32)
     add_compile_options(/utf-8)
-elseif (UNIX)
+elseif(UNIX)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-endif (UNIX)
+endif()
 
 include_directories(../include)
 
