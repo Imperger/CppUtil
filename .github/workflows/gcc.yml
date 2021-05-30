@@ -15,6 +15,7 @@ jobs:
         config:
           - { name: Address sanitize, sanitizer: address }
           - { name: Thread sanitizer, sanitizer: thread }
+          - { name: Undefined behaiver sanitizer, sanitizer: undefined }
     steps:
       - uses: actions/checkout@v2
       - name: Configure
