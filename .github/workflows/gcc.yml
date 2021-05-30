@@ -1,4 +1,4 @@
-name: Test
+name: Gcc
 
 on: [push, pull_request]
 
