@@ -21,7 +21,7 @@ jobs:
       - name: Configure
         run: |
           mkdir build
-          cmake -DCMAKE_CXX_FLAGS_DEBUG="-fsanitize=${{ matrix.config.sanitizer }}" -DCMAKE_LINKER_FLAGS_DEBUG="-fsanitize=${{ matrix.config.sanitizer }}" -S test -B build
+          cmake -DCMAKE_CXX_FLAGS="-fsanitize=${{ matrix.config.sanitizer }}" -S test -B build
       - name: Build
         run: cmake --build build --config Debug
       - name: Run
