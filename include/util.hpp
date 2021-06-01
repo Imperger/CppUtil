@@ -363,7 +363,7 @@ private:
 			++completion_counter;
 
 			if (completed())
-				complete_event.notify_one();
+				complete_event.notify_all();
 		}
 	}
 private:
