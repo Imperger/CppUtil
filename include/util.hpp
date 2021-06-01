@@ -361,8 +361,10 @@ private:
 		{
 			std::lock_guard<std::mutex> lk(m);
 			++completion_counter;
+
+			if (completed())
+				complete_event.notify_one();
 		}
-		complete_event.notify_one();
 	}
 private:
 	std::vector<std::function<void()>> tasks;
@@ -638,8 +640,8 @@ class random_iterator
 public:
 	using difference_type = std::ptrdiff_t;
 	using value_type = T;
-	using pointer = T*;
-	using reference = T&;
+	using pointer = T * ;
+	using reference = T & ;
 	using iterator_category = std::forward_iterator_tag;
 public:
 	template<typename ...Args>
