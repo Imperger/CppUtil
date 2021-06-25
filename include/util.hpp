@@ -23,6 +23,7 @@
 #include <numeric>
 #include <cassert>
 #ifdef _WIN32
+#define NOMINMAX
 #include<Windows.h>
 #endif
 namespace util
@@ -821,6 +822,62 @@ template<typename Container,
 
 	return os;
 }
+
+template<typename It1, typename It2, typename D>
+void merge(It1 first1, It1 last1, It2 first2, It2 last2, D dest)
+{
+	while (first1 != last1)
+	{
+		if (first2 == last2)
+		{
+			std::copy(first1, last1, dest);
+			return;
+		}
+
+		if (*first1 < *first2)
+		{
+			*dest++ = *first1++;
+		}
+		else
+		{
+			*dest++ = *first2++;
+		}
+	}
+
+	std::copy(first2, last2, dest);
+}
+
+namespace sort
+{
+
+template<typename It>
+void merge(It first, It last)
+{
+	auto origin_first = first;
+	size_t len = std::distance(first, last);
+	std::vector<typename It::value_type> temp(len);
+	auto temp_first = temp.begin();
+	for (size_t sub_len = 1; sub_len < len; sub_len <<= 1)
+	{
+		for (size_t n = 0; n < len; n += sub_len << 1)
+		{
+			auto mid = std::next(first, std::min(n + sub_len, len));
+
+			util::merge(std::next(first, n), mid,
+				mid, std::next(first, std::min(std::distance(first, mid) + sub_len, len)),
+				std::next(temp_first, n));
+
+		}
+
+		std::swap(temp_first, first);
+	}
+
+	if (static_cast<int64_t>(std::ceil(std::log2(len))) % 2)
+		std::swap_ranges(origin_first, last, temp.begin());
+}
+
+}
+
 #ifdef _WIN32
 
 class WinCin

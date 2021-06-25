@@ -189,6 +189,50 @@ void test_print_memory()
 	test(ss.str() == "31 32 33 34 35 36 37 38 39 30                    1234567890");
 }
 
+template<typename T>
+void test_merge_impl(std::initializer_list<T>&& c1, std::initializer_list<T>&& c2)
+{
+	std::vector<T> d1(c1.size() + c2.size());
+	std::vector<T> d2(c1.size() + c2.size());
+
+	std::merge(c1.begin(), c1.end(), c2.begin(), c2.end(), d1.begin());
+	util::merge(c1.begin(), c1.end(), c2.begin(), c2.end(), d2.begin());
+
+	test(d1 == d2);
+}
+
+void test_merge()
+{
+	test_merge_impl({ 1, 2, 4, 5, 6, 7 }, { 3, 5, 8, 10 });
+	test_merge_impl({ 6, 7, 8, 9, 10 }, { 1, 2, 3, 4, 5 });
+}
+
+template<typename T>
+void test_merge_sort_impl(T&& c)
+{
+	std::vector<typename std::remove_reference_t<T>::value_type> a1(c.begin(), c.end());
+	auto a2 = a1;
+
+	std::sort(a1.begin(), a1.end());
+	util::sort::merge(a2.begin(), a2.end());
+
+	test(a1 == a2);
+}
+
+void test_merge_sort()
+{
+	test_merge_sort_impl(std::vector<int64_t>{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
+	test_merge_sort_impl(std::vector<int64_t>{ 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 });
+	test_merge_sort_impl(std::vector<int64_t>{ 1, 3, 5, 6, 0, 2, 7, 2 });
+
+	util::random_int_iterator rnd(-10000, 10000);
+
+	std::vector<int64_t> rnd_v(10000);
+	std::generate(rnd_v.begin(), rnd_v.end(), [&]() { return *rnd++; });
+
+	test_merge_sort_impl(rnd_v);
+}
+
 int main()
 {
 	try
@@ -207,6 +251,8 @@ int main()
 		random_iterator_test();
 		test_utf8_iterator();
 		test_print_memory();
+		test_merge();
+		test_merge_sort();
 	}
 	catch (...)
 	{
