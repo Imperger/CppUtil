@@ -320,3 +320,16 @@ bool empty() const
 ```cpp
 size_t size() const
 ```
+
+## merge
+
+```cpp
+template<typename It1, typename It2, typename D>
+void merge(It1 first1, It1 last1, It2 first2, It2 last2, D dest)
+```
+
+## sort::merge
+```cpp
+template<typename It>
+void merge(It first, It last)
+```
