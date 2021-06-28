@@ -216,6 +216,8 @@ class queue
   public:
     queue() : mem{nullptr, 0}, head(0), size(0) {}
 
+    ~queue() { delete[] mem.ptr; }
+
     template<typename V>
     void push(V &&val)
     {
@@ -277,7 +279,7 @@ class queue
 
         std::copy(mem.ptr, mem.ptr + mem.size, new_mem);
 
-        delete mem.ptr;
+        delete[] mem.ptr;
 
         mem.ptr = new_mem;
         mem.size = new_size;
