@@ -206,6 +206,96 @@ class matrix
 };
 template<typename Type, size_t M, size_t N>
 matrix(const Type (&mtx)[M][N]) -> matrix<Type>;
+
+/*
+ * queue
+ */
+template<typename T>
+class queue
+{
+  public:
+    queue() : mem{nullptr, 0}, head(0), size(0) {}
+
+    template<typename V>
+    void push(V &&val)
+    {
+        if (has_slot())
+        {
+            assign_val(std::forward<V>(val));
+        }
+        else
+        {
+            extend();
+
+            assign_val(std::forward<V>(val));
+        }
+
+        ++size;
+    }
+
+    void pop()
+    {
+        if (size == 0)
+            return;
+
+        head = (head + 1) % mem.size;
+        --size;
+    }
+
+    T const &front() const
+    {
+        if (size == 0)
+            throw std::runtime_error("Trying to access front element on empty queue");
+
+        return *(mem.ptr + head);
+    }
+
+    T &front() { return const_cast<T &>(static_cast<const queue &>(*this).front()); }
+
+    T &back() { return const_cast<T &>(static_cast<const queue &>(*this).back()); }
+
+    T const &back() const
+
+    {
+        if (size == 0)
+            throw std::runtime_error("Trying to access last element on empty queue");
+
+        return *(mem.ptr + (head + size - 1) % mem.size);
+    }
+
+    bool empty() const { return !size; }
+
+  private:
+    bool has_slot() const { return size < mem.size; }
+
+    T *free_slot() const { return mem.ptr + (head + size) % mem.size; }
+
+    void extend()
+    {
+        size_t const new_size = mem.size ? 2 * mem.size : 1;
+        T *new_mem = new T[new_size];
+
+        std::copy(mem.ptr, mem.ptr + mem.size, new_mem);
+
+        delete mem.ptr;
+
+        mem.ptr = new_mem;
+        mem.size = new_size;
+    }
+
+    void assign_val(T const &val) { *free_slot() = val; }
+
+    void assign_val(T &&val) { *free_slot() = std::move(val); }
+
+    struct
+    {
+        T *ptr;
+        size_t size;
+    } mem;
+    size_t head;
+    size_t size;
+};
+
 /*
  * fixed_queue
  */

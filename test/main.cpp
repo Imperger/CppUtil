@@ -71,6 +71,52 @@ void test_matrix()
 	test(m.determinant() == -14);
 }
 
+void test_queue()
+{
+	util::queue<int64_t> q;
+
+	q.push(10);
+	test(q.front() == 10);
+	test(q.back() == 10);
+	q.push(20);
+	test(q.front() == 10);
+	test(q.back() == 20);
+	q.push(30);
+	test(q.front() == 10);
+	test(q.back() == 30);
+	q.push(40);
+	test(q.front() == 10);
+	test(q.back() == 40);
+
+	int64_t x = 42;
+	q.push(x);
+	test(q.front() == 10);
+	test(q.back() == 42);
+	q.pop();
+	test(q.front() == 20);
+	test(q.back() == 42);
+	q.pop();
+	q.pop();
+	q.pop();
+	q.pop();
+
+	test(q.empty());
+
+	try
+	{
+		q.pop();
+		test("Non handled pop on empty queue");
+	}
+	catch (...) {}
+
+	try
+	{
+		q.back();
+		test("Non handled back on empty queue");
+	}
+	catch (...) {}
+}
+
 void test_fixed_queue()
 {
 	util::fixed_queue<int64_t, 3> q;
@@ -243,6 +289,7 @@ int main()
 		test_standard_deviation();
 		test_max_subarray_sum();
 		test_matrix();
+		test_queue();
 		test_fixed_queue();
 		test_threadsafe_queue();
 		test_threadsafe_priority_queue();

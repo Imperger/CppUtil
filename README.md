@@ -246,6 +246,36 @@ std::istream& operator>>(std::istream& is, Container& x)
 template<typename Container, typename T = typename Container::value_type>
 std::ostream& operator<<(std::ostream& os, const Container& x)
 ```
+
+## queue
+
+```cpp
+template<typename T>
+class queue
+```
+```cpp
+template<typename V>
+void push(V &&val)
+```
+```cpp
+void pop()
+```
+```cpp
+T const &front() const
+```
+```cpp
+T &front()
+ ```
+ ```cpp
+ T &back()
+ ```
+ ```cpp
+ T const &back() const
+ ```
+ ```cpp
+ bool empty() const
+ ```
+
 ## fixed_queue
 
 ```cpp
