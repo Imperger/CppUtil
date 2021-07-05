@@ -1,3 +1,4 @@
+#define TIMING
 #include "util.hpp"
 
 #include <cstdint>
@@ -225,6 +226,25 @@ void test_utf8_iterator()
 	test(*++it == *L"т");
 }
 
+void test_timing()
+{
+	{
+		auto fn = [](auto a, auto b, auto c) { return a * b + c; };
+		std::stringstream ss;
+		auto result = util::timing("Test#1", ss, fn, 10, 20, 30);
+
+		test(result == 230 && ss.str().find("Test#1") != std::string::npos);
+	}
+
+	{
+		auto fn = [] {};
+		std::stringstream ss;
+		util::timing("Test#2", ss, fn);
+
+		test(ss.str().find("Test#2") != std::string::npos);
+	}
+}
+
 void test_print_memory()
 {
 	std::string x = "1234567890";
@@ -297,6 +317,7 @@ int main()
 		test_parallel_map();
 		random_iterator_test();
 		test_utf8_iterator();
+		test_timing();
 		test_print_memory();
 		test_merge();
 		test_merge_sort();

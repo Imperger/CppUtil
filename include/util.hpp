@@ -683,9 +683,8 @@ class parallel_map
  */
 class timer
 {
-    using clock = std::chrono::steady_clock;
-
   public:
+    using clock = std::chrono::steady_clock;
     void start() { tm = clock::now(); }
 
     template<typename Period = std::chrono::milliseconds>
@@ -705,6 +704,86 @@ class timer
   private:
     std::chrono::steady_clock::time_point tm;
 };
+
+template<typename Fn, typename... Args>
+struct has_return_type
+{
+    static constexpr bool value =
+        std::negation_v<std::bool_constant<std::is_void_v<std::invoke_result_t<Fn, Args...>>>>;
+};
+
+std::string ms_to_string(uint64_t ms, int precision = 2)
+{
+    double x = static_cast<double>(ms);
+    std::ostringstream os;
+    os.precision(precision);
+    os << std::fixed;
+
+    if (ms < 1000)
+    {
+        os << x << "ms";
+    }
+    else if (ms < 60 * 1000)
+    {
+        os << x / 1000 << "s";
+    }
+    else if (ms < 60 * 60 * 1000)
+    {
+        os << x / 60 / 1000 << "m";
+    }
+    else
+    {
+        os << x / 60 / 60 / 1000 << "h";
+    }
+
+    return os.str();
+}
+
+#ifdef TIMING
+namespace internal
+{
+class initialized_timer : protected timer
+{
+    std::chrono::steady_clock::time_point start_time;
+
+  public:
+    using timer::reset;
+    using timer::start;
+    using timer::stop;
+    initialized_timer() : start_time(timer::clock::now()) {}
+    template<typename Period = std::chrono::milliseconds>
+    uint64_t elapsed() const
+    {
+        return std::chrono::duration_cast<Period>(clock::now() - start_time).count();
+    }
+};
+inline initialized_timer timer;
+} // namespace internal
+
+template<typename Fn, typename... Args, typename = std::enable_if_t<has_return_type<Fn, Args...>::value>>
+auto timing(const char *msg, std::ostream &os, Fn &&fn, Args &&... args)
+{
+    os << "[" << ms_to_string(internal::timer.elapsed(), 1) << "] " << msg;
+    internal::timer.start();
+    auto &&ret = fn(args...);
+    uint64_t d = internal::timer.stop();
+    os << " +" << ms_to_string(d) << '\n';
+    return ret;
+}
+
+template<typename Fn,
+         typename... Args,
+         typename = std::enable_if_t<std::negation_v<std::bool_constant<has_return_type<Fn, Args...>::value>>>>
+void timing(const char *msg, std::ostream &os, Fn &&fn, Args &&... args)
+{
+    os << "[" << ms_to_string(internal::timer.elapsed(), 1) << "] " << msg;
+    internal::timer.start();
+    fn(args...);
+    uint64_t d = internal::timer.stop();
+    os << " +" << ms_to_string(d) << '\n';
+}
+
+#endif // TIMING
 
 struct PrintOptions
 {

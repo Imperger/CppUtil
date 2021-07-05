@@ -162,6 +162,20 @@ uint64_t reset()
 ## formaters
 
 ```cpp
+template<typename Fn, 
+		 typename... Args, 
+		 typename = std::enable_if_t<has_return_type<Fn, Args...>::value>>
+auto timing(const char *msg, std::ostream &os, Fn &&fn, Args &&... args)
+```
+```cpp
+template<typename Fn,
+         typename... Args,
+         typename = std::enable_if_t<std::negation_v<std::bool_constant<has_return_type<Fn, Args...>::value>>>>
+void timing(const char *msg, std::ostream &os, Fn &&fn, Args &&... args)
+```
+### print memory
+
+```cpp
 void print_memory(const char* mem, size_t size, std::ostream& os, const PrintOptions& opt = { 16, true, true, '.' })
 ```
 ```cpp
