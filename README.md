@@ -66,6 +66,13 @@ const_row_holder operator[](std::size_t idx) const
 T determinant() const
 ```
 
+## Longest common subsequence
+
+```cpp
+template<typename RndIt1, typename RndIt2>
+std::vector<RndIt1> lcs(RndIt1 first1, RndIt1 last1, RndIt2 first2, RndIt2 last2)
+```
+
 ## thread_pool
 
 ```cpp
