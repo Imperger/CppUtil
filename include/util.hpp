@@ -209,6 +209,70 @@ template<typename Type, size_t M, size_t N>
 matrix(const Type (&mtx)[M][N]) -> matrix<Type>;
 
 /*
+ * Longest common subsequence
+ */
+template<typename RndIt1, typename RndIt2>
+std::vector<RndIt1> lcs(RndIt1 first1, RndIt1 last1, RndIt2 first2, RndIt2 last2)
+{
+    enum dir
+    {
+        left,
+        up,
+        diagonal
+    };
+
+    auto const length1 = last1 - first1;
+    auto const length2 = last2 - first2;
+
+    assert(length1 >= 0 && "Negative input1 length");
+    assert(length2 >= 0 && "Negative input2 length");
+
+    if (!(length1 && length2))
+        return {};
+
+    matrix<int64_t> lens(length1 + 1, length2 + 1);
+
+    for (int64_t m = length1 - 1; m >= 0; --m)
+    {
+        for (int64_t n = length2 - 1; n >= 0; --n)
+        {
+            if (*(first1 + m) == *(first2 + n))
+            {
+                lens[m][n] = lens[m + 1][n + 1] + 1;
+            }
+            else
+            {
+                lens[m][n] = std::max(lens[m + 1][n], lens[m][n + 1]);
+            }
+        }
+    }
+
+    std::vector<RndIt1> ret;
+    for (size_t m = 0, n = 0; lens[m][n] != 0; )
+    {
+        if (*(first1 + m) == *(first2 + n))
+        {
+            ret.push_back(first1 + m);
+            ++m;
+            ++n;
+        }
+        else
+        {
+            if (lens[m][n] == lens[m + 1][n])
+            {
+                ++m;
+            }
+            else
+            {
+                ++n;
+            }
+        }
+    }
+
+    return ret;
+}
+
+/*
  * queue
  */
 template<typename T>
