@@ -69,6 +69,11 @@ void test_matrix()
 {
 	util::matrix<int64_t> m({ {3, 8}, {4, 6} });
 
+	test(m[0][0] == 3);
+	test(m[0][1] == 8);
+	test(m[1][0] == 4);
+	test(m[1][1] == 6);
+
 	test(m.determinant() == -14);
 }
 
