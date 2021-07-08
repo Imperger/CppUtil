@@ -248,7 +248,7 @@ std::vector<RndIt1> lcs(RndIt1 first1, RndIt1 last1, RndIt2 first2, RndIt2 last2
     }
 
     std::vector<RndIt1> ret;
-    for (size_t m = 0, n = 0; lens[m][n] != 0; )
+    for (size_t m = 0, n = 0; lens[m][n] != 0;)
     {
         if (*(first1 + m) == *(first2 + n))
         {
@@ -826,7 +826,7 @@ inline initialized_timer timer;
 } // namespace internal
 
 template<typename Fn, typename... Args, typename = std::enable_if_t<has_return_type<Fn, Args...>::value>>
-auto timing(const char *msg, std::ostream &os, Fn &&fn, Args &&... args)
+auto timing(const char *msg, std::ostream &os, Fn &&fn, Args &&...args)
 {
     os << "[" << ms_to_string(internal::timer.elapsed(), 1) << "] " << msg;
     internal::timer.start();
@@ -839,7 +839,7 @@ auto timing(const char *msg, std::ostream &os, Fn &&fn, Args &&... args)
 template<typename Fn,
          typename... Args,
          typename = std::enable_if_t<std::negation_v<std::bool_constant<has_return_type<Fn, Args...>::value>>>>
-void timing(const char *msg, std::ostream &os, Fn &&fn, Args &&... args)
+void timing(const char *msg, std::ostream &os, Fn &&fn, Args &&...args)
 {
     os << "[" << ms_to_string(internal::timer.elapsed(), 1) << "] " << msg;
     internal::timer.start();
