@@ -111,6 +111,7 @@ max_subarray_result<It> max_subarray_sum(It begin, It end)
 
     return best;
 }
+
 /*
  * matrix
  */
@@ -122,7 +123,7 @@ class matrix
       public:
         explicit row_holder(std::size_t m, matrix &mt) : m(m), mt(mt) {}
 
-        T &operator[](std::size_t n) { return mt.data[m * mt.m + n]; }
+        T &operator[](std::size_t n) { return mt.data[m * mt.n + n]; }
 
       private:
         std::size_t m;
