@@ -77,6 +77,36 @@ void test_matrix()
 	test(m.determinant() == -14);
 }
 
+void test_lcs()
+{
+	struct testcase
+	{
+		std::string a;
+		std::string b;
+		std::vector<std::string::const_iterator> expect;
+	};
+
+	testcase t1{ "aava", "aaa" };
+	t1.expect = { t1.a.begin(), t1.a.begin() + 1, t1.a.begin() + 3 };
+
+	testcase t2{ "aaa", "aava" };
+	t2.expect = { t2.a.begin(), t2.a.begin() + 1, t2.a.begin() + 2 };
+
+	testcase t3{ "abcdefg", "bcfg" };
+	t3.expect = { t3.a.begin() + 1,
+		t3.a.begin() + 2,
+		t3.a.begin() + 5,
+		t3.a.begin() + 6 };
+
+	std::vector<testcase const*> testcases{ &t1 };
+
+	for (auto const* t : testcases)
+	{
+		auto ret = util::lcs(t->a.begin(), t->a.end(), t->b.begin(), t->b.end());
+		test(ret == t->expect);
+	}
+}
+
 void test_queue()
 {
 	util::queue<int64_t> q;
@@ -145,9 +175,9 @@ void test_threadsafe_queue()
 	for (uint64_t n = 0; n < threadCount; ++n)
 	{
 		threadlist.push_back(std::thread([&, n]
-		{
-			q.push(n);
-		}));
+			{
+				q.push(n);
+			}));
 	}
 
 	for (auto& t : threadlist)
@@ -314,6 +344,7 @@ int main()
 		test_standard_deviation();
 		test_max_subarray_sum();
 		test_matrix();
+		test_lcs();
 		test_queue();
 		test_fixed_queue();
 		test_threadsafe_queue();
