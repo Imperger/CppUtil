@@ -77,7 +77,7 @@ void test_matrix()
 	test(m.determinant() == -14);
 }
 
-void test_lcs()
+void test_longest_common_subsequence()
 {
 	struct testcase
 	{
@@ -102,7 +102,7 @@ void test_lcs()
 
 	for (auto const* t : testcases)
 	{
-		auto ret = util::lcs(t->a.begin(), t->a.end(), t->b.begin(), t->b.end());
+		auto ret = util::longest_common_subsequence(t->a.begin(), t->a.end(), t->b.begin(), t->b.end());
 		test(ret == t->expect);
 	}
 }
@@ -344,7 +344,7 @@ int main()
 		test_standard_deviation();
 		test_max_subarray_sum();
 		test_matrix();
-		test_lcs();
+		test_longest_common_subsequence();
 		test_queue();
 		test_fixed_queue();
 		test_threadsafe_queue();
