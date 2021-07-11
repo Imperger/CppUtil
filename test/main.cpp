@@ -47,11 +47,11 @@ void test_standard_deviation()
 
 namespace
 {
-template<typename It>
-bool operator==(const util::max_subarray_result<It>& a, const util::max_subarray_result<It>& b)
-{
-	return a.begin == b.begin && a.end == b.end && a.sum == b.sum;
-}
+	template<typename It>
+	bool operator==(const util::max_subarray_result<It>& a, const util::max_subarray_result<It>& b)
+	{
+		return a.begin == b.begin && a.end == b.end && a.sum == b.sum;
+	}
 }
 
 void test_max_subarray_sum()
@@ -103,6 +103,37 @@ void test_longest_common_subsequence()
 	for (auto const* t : testcases)
 	{
 		auto ret = util::longest_common_subsequence(t->a.begin(), t->a.end(), t->b.begin(), t->b.end());
+		test(ret == t->expect);
+	}
+}
+
+void test_longest_common_substring()
+{
+	struct testcase
+	{
+		std::string a;
+		std::string b;
+		std::pair<std::string::const_iterator, std::string::const_iterator> expect;
+	};
+
+	testcase t1{ "aava", "aaa" };
+	t1.expect = std::make_pair(t1.a.begin(), t1.a.begin() + 2);
+
+	testcase t2{ "aaa", "aava" };
+	t2.expect = std::make_pair(t2.a.begin(), t2.a.begin() + 2);
+
+	testcase t3{ "abcdef", "bcdf" };
+	t3.expect = std::make_pair(t3.a.begin() + 1, t3.a.begin() + 4);
+
+	// 'bc' and 'fg' has same length but search starts from the end and 'fg' being found first
+	testcase t4{ "abcdefg", "bcfg" };
+	t4.expect = std::make_pair(t4.a.begin() + 5, t4.a.begin() + 7);
+
+	std::vector<testcase const*> testcases{ &t1 };
+
+	for (auto const* t : testcases)
+	{
+		auto ret = util::longest_common_substring(t->a.begin(), t->a.end(), t->b.begin(), t->b.end());
 		test(ret == t->expect);
 	}
 }
@@ -345,6 +376,7 @@ int main()
 		test_max_subarray_sum();
 		test_matrix();
 		test_longest_common_subsequence();
+		test_longest_common_substring();
 		test_queue();
 		test_fixed_queue();
 		test_threadsafe_queue();
