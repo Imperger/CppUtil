@@ -312,6 +312,15 @@ std::pair<RndIt1, RndIt1> longest_common_substring(RndIt1 first1, RndIt1 last1, 
 }
 
 /*
+ * Longest palindrome subsequence
+ */
+template<typename RndIt>
+std::vector<RndIt> longest_palindrome_subsequence(RndIt first, RndIt last)
+{
+    return longest_common_subsequence(first, last, std::make_reverse_iterator(last), std::make_reverse_iterator(first));
+}
+
+/*
  * queue
  */
 template<typename T>
@@ -865,7 +874,7 @@ inline initialized_timer timer;
 } // namespace internal
 
 template<typename Fn, typename... Args, typename = std::enable_if_t<has_return_type<Fn, Args...>::value>>
-auto timing(const char *msg, std::ostream &os, Fn &&fn, Args &&...args)
+auto timing(const char *msg, std::ostream &os, Fn &&fn, Args &&... args)
 {
     os << "[" << ms_to_string(internal::timer.elapsed(), 1) << "] " << msg;
     internal::timer.start();
@@ -878,7 +887,7 @@ auto timing(const char *msg, std::ostream &os, Fn &&fn, Args &&...args)
 template<typename Fn,
          typename... Args,
          typename = std::enable_if_t<std::negation_v<std::bool_constant<has_return_type<Fn, Args...>::value>>>>
-void timing(const char *msg, std::ostream &os, Fn &&fn, Args &&...args)
+void timing(const char *msg, std::ostream &os, Fn &&fn, Args &&... args)
 {
     os << "[" << ms_to_string(internal::timer.elapsed(), 1) << "] " << msg;
     internal::timer.start();

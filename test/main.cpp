@@ -138,6 +138,22 @@ void test_longest_common_substring()
 	}
 }
 
+void test_longest_palindrome_subsequence()
+{
+	std::string t = "abcdxjdocboa";
+	std::vector<std::string::const_iterator> expect{ t.begin(),
+		t.begin() + 1,
+		t.begin() + 2,
+		t.begin() + 3,
+		t.begin() + 5,
+		t.begin() + 6,
+		t.begin() + 8,
+		t.begin() + 9,
+		t.begin() + 11 };
+
+	test(util::longest_palindrome_subsequence(t.cbegin(), t.cend()) == expect);
+}
+
 void test_queue()
 {
 	util::queue<int64_t> q;
@@ -377,6 +393,7 @@ int main()
 		test_matrix();
 		test_longest_common_subsequence();
 		test_longest_common_substring();
+		test_longest_palindrome_subsequence();
 		test_queue();
 		test_fixed_queue();
 		test_threadsafe_queue();
