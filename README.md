@@ -80,6 +80,13 @@ template<typename RndIt1, typename RndIt2>
 std::pair<RndIt1> longest_common_substring(RndIt1 first1, RndIt1 last1, RndIt2 first2, RndIt2 last2)
 ```
 
+## Longest palindrome subsequence
+
+```cpp
+template<typename RndIt>
+std::vector<RndIt> longest_palindrome_subsequence(RndIt first, RndIt last)
+```
+
 ## thread_pool
 
 ```cpp
