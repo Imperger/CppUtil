@@ -1150,7 +1150,7 @@ std::ostream &operator<<(std::ostream &os, const Container &x)
     {
         auto h = std::min<size_t>(x.size(), PRINT_LENGTH_LIMIT) - 1;
         std::copy_n(x.begin(), h, std::ostream_iterator<T>(os, ", "));
-        std::cout << "..., ";
+        os << "..., ";
     }
     else
     {
