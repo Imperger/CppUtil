@@ -381,6 +381,53 @@ void test_merge_sort()
 	test_merge_sort_impl(rnd_v);
 }
 
+void test_levenshtein_distance()
+{
+	{
+		std::string a = "Hello";
+		std::string b = "Hi";
+
+		auto result = util::levenshtein_distance(
+			a.begin(), a.end(),
+			b.begin(), b.end());
+
+		test(result == 4);
+	}
+
+	{
+		std::string a = "Hello";
+		std::string b = "Hll";
+
+		auto result = util::levenshtein_distance(
+			a.begin(), a.end(),
+			b.begin(), b.end());
+
+		test(result == 2);
+	}
+
+	{
+		std::string a = "Hello";
+		std::string b = "Hello";
+
+		auto result = util::levenshtein_distance(
+			a.begin(), a.end(),
+			b.begin(), b.end());
+
+		test(result == 0);
+	}
+
+	{
+		std::string a = "Hello";
+		std::string b = "Hi";
+
+		auto result = util::levenshtein_distance(
+			a.begin(), a.end(),
+			b.begin(), b.end(), {2, 2, 1});
+
+		test(result == 7);
+	}
+}
+
 int main()
 {
 	try
@@ -406,6 +453,7 @@ int main()
 		test_print_memory();
 		test_merge();
 		test_merge_sort();
+		test_levenshtein_distance();
 	}
 	catch (...)
 	{

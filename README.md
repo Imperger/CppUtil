@@ -269,7 +269,10 @@ char32_t operator*()
 ```cpp
 bool operator!=(Iterator r) const
 ```
-
+```cpp
+template<typename It>
+uint64_t levenshtein_distance(It first1, It last1, It first2, It last2, levenshtein_costs const &costs = {1, 1, 1})
+```
 ## IO overloads for containers
 
 ```cpp
