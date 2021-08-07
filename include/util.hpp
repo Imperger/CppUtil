@@ -1217,6 +1217,45 @@ void merge(It first, It last)
 
 } // namespace sort
 
+struct levenshtein_costs
+{
+    int64_t deletion;
+    int64_t insertion;
+    int64_t substitution;
+};
+
+template<typename It>
+uint64_t levenshtein_distance(It first1, It last1, It first2, It last2, levenshtein_costs const &costs = {1, 1, 1})
+{
+    auto len1 = last1 - first1;
+    auto len2 = last2 - first2;
+    std::vector<int64_t> prev_row(len2 + 1);
+    std::vector<int64_t> row(len2 + 1);
+
+    for (size_t n = 1; n < prev_row.size(); ++n)
+    {
+        prev_row[n] = prev_row[n - 1] + costs.insertion;
+    }
+
+    for (size_t n = 0; n < len1; ++n)
+    {
+        row[0] = prev_row[0] + costs.deletion;
+
+        for (size_t i = 0; i < len2; ++i)
+        {
+            uint64_t deletion = prev_row[i + 1] + costs.deletion;
+            uint64_t insertion = row[i] + costs.insertion;
+            uint64_t substitution = prev_row[i] + costs.substitution * (*(first1 + n) != *(first2 + i));
+
+            row[i + 1] = std::min({deletion, insertion, substitution});
+        }
+
+        std::swap(prev_row, row);
+    }
+
+    return prev_row[len2];
+}
+
 #ifdef _WIN32
 
 class WinCin
