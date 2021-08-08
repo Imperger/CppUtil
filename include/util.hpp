@@ -761,7 +761,7 @@ class parallel_map
 
     void run() &
     {
-        auto chunk_size = target->size() / pool->size();
+        uint64_t chunk_size = std::ceil(static_cast<double>(target->size()) / pool->size());
         for (auto begin = target->begin(); begin < target->end(); std::advance(begin, chunk_size))
         {
             auto end = begin + chunk_size;
