@@ -428,6 +428,40 @@ void test_levenshtein_distance()
 	}
 }
 
+template<typename T>
+void test_lomuto_partition_impl(std::vector<T> const& c, size_t pivot, size_t expected)
+{
+	auto t = c;
+	auto it = util::lomuto_partition(t.begin(), t.end(), t.begin() + pivot);
+
+	test(it == t.begin() + expected);
+}
+
+void test_lomuto_partition()
+{
+	test_lomuto_partition_impl<int>({ 2, 4, 7, 1, 0, 3 }, 5, 3);
+	test_lomuto_partition_impl<int>({ 5, 4, 3, 2, 1 }, 0, 4);
+	test_lomuto_partition_impl<int>({ 5, 4, 3, 2, 1 }, 4, 0);
+	test_lomuto_partition_impl<int>({ 2, 1, 3, 5, 4 }, 2, 2);
+	test_lomuto_partition_impl<int>({ 2, 1, 4, 3, 8, 6 }, 2, 3);
+}
+
+template<typename T>
+void test_quick_select_impl(std::vector<T> const& c, size_t k, T expected)
+{
+	auto t = c;
+	util::quick_select(t.begin(), t.end(), k);
+
+	test(*(t.begin() + k) == expected);
+}
+
+void test_quick_select()
+{
+	test_quick_select_impl<int>({1, 2, 3, 4, 5}, 2, 3);
+	test_quick_select_impl<int>({5, 4, 3, 2, 1}, 2, 3);
+	test_quick_select_impl<int>({2, 1, 4, 3, 8, 6}, 4, 6);
+}
+
 int main()
 {
 	try
@@ -454,6 +488,8 @@ int main()
 		test_merge();
 		test_merge_sort();
 		test_levenshtein_distance();
+		test_lomuto_partition();
+		test_quick_select();
 	}
 	catch (...)
 	{
