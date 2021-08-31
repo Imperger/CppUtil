@@ -403,3 +403,15 @@ void merge(It1 first1, It1 last1, It2 first2, It2 last2, D dest)
 template<typename It>
 void merge(It first, It last)
 ```
+
+## lomuto_partition
+```cpp
+template<typename It>
+It lomuto_partition(It first, It second, It pivot)
+```
+
+## quick_select
+```cpp
+template<typename It, typename P = std::function<It(It, It, It)>>
+void quick_select(It first, It second, size_t k, P partition = &lomuto_partition<It>)
+```
