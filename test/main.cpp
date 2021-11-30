@@ -428,6 +428,21 @@ void test_levenshtein_distance()
 	}
 }
 
+#ifndef __clang__
+void test_literals()
+{
+	using namespace util::distance_literals;
+
+	test(1_km == 100000_cm);
+	test(1_m + 1_m == 2_m);
+	test(1_m + 1_m == 200_cm);
+	test(1_m + 2_cm == 102_cm);
+	test(1_m - 100_cm == 0_km);
+	test(1_m - 10_cm == 90_cm);
+	test(1_cm - 1_m == -99_cm);
+}
+#endif // __clang__
+
 int main()
 {
 	try
@@ -454,6 +469,9 @@ int main()
 		test_merge();
 		test_merge_sort();
 		test_levenshtein_distance();
+#ifndef __clang__
+		test_literals();
+#endif // __clang__
 	}
 	catch (...)
 	{
