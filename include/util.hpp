@@ -1185,6 +1185,51 @@ void merge(It1 first1, It1 last1, It2 first2, It2 last2, D dest)
     std::copy(first2, last2, dest);
 }
 
+template<typename It>
+It lomuto_partition(It first, It second, It pivot)
+{
+    using std::swap;
+
+    It last = std::prev(second);
+    swap(*pivot, *last);
+    It store = first;
+    for (auto it = first; it != last; ++it)
+    {
+        if (*it < *last)
+        {
+            swap(*it, *store);
+            ++store;
+        }
+    }
+
+    swap(*store, *last);
+
+    return store;
+}
+
+template<typename It, typename P = std::function<It(It, It, It)>>
+void quick_select(It first, It second, size_t k, P partition = &lomuto_partition<It>)
+{
+    auto k_it = first + k;
+
+    while (first != second)
+    {
+        auto pivot = partition(first, second, first + (second - first) / 2);
+        if (pivot == k_it)
+        {
+            return;
+        }
+        else if (k_it < pivot)
+        {
+            second = pivot;
+        }
+        else
+        {
+            first = pivot + 1;
+        }
+    }
+}
+
 namespace sort
 {
 
