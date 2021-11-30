@@ -415,3 +415,120 @@ It lomuto_partition(It first, It second, It pivot)
 template<typename It, typename P = std::function<It(It, It, It)>>
 void quick_select(It first, It second, size_t k, P partition = &lomuto_partition<It>)
 ```
+
+## literals
+```cpp
+template<typename T, typename Unit>
+class prefixed_value
+```
+
+```cpp
+template<typename To, typename T, typename U>
+constexpr To prefixed_value_cast(prefixed_value<T, U> const &value)
+```
+
+```cpp
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr bool operator==(prefixed_value<T1, U1> const &l, prefixed_value<T2, U2> const &r)
+```
+
+```cpp
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr bool operator!=(prefixed_value<T1, U1> const &l, prefixed_value<T2, U2> const &r)
+```
+
+```cpp
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>> operator+(prefixed_value<T1, U1> const &l,
+                                                                                       prefixed_value<T2, U2> const &r)
+```
+
+```cpp
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>> operator-(prefixed_value<T1, U1> const &l,
+                                                                                       prefixed_value<T2, U2> const &r)
+```
+
+```cpp
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>> operator*(prefixed_value<T1, U1> const &l,
+                                                                                       prefixed_value<T2, U2> const &r)
+```
+
+```cpp
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>> operator/(prefixed_value<T1, U1> const &l,
+                                                                                       prefixed_value<T2, U2> const &r)
+```
+
+## distance_literals
+
+```cpp
+template<typename T, typename Unit>
+class distance : public literals::prefixed_value<T, Unit>
+```
+
+```cpp
+template<typename T>
+using km = distance<T, literals::unit<1000.l>>
+```
+
+```cpp
+template<typename T>
+using m = distance<T, literals::unit<1.l>>
+```
+
+```cpp
+template<typename T>
+using cm = distance<T, literals::unit<0.01l>>
+```
+
+```cpp
+template<typename T>
+using mm = distance<T, literals::unit<0.001l>>
+```
+
+```cpp
+template<typename T>
+using mile = distance<T, literals::unit<1609.344l>>
+```
+
+```cpp
+km<int64_t> operator""_km(unsigned long long x)
+```
+
+```cpp
+m<int64_t> operator""_m(unsigned long long x)
+```
+
+```cpp
+cm<int64_t> operator""_cm(unsigned long long x)
+```
+
+```cpp
+mm<int64_t> operator""_mm(unsigned long long x)
+```
+
+```cpp
+mile<int64_t> operator""_mile(unsigned long long x)
+```
+
+```cpp
+km<long double> operator""_km(long double x)
+```
+
+```cpp
+m<long double> operator""_m(long double x)
+```
+
+```cpp
+cm<long double> operator""_cm(long double x)
+```
+
+```cpp
+mm<long double> operator""_mm(long double x)
+```
+
+```cpp
+mile<long double> operator""_mile(long double x)
+```
