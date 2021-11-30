@@ -14,7 +14,7 @@ jobs:
       - name: Configure
         run: |
           mkdir build
-          cmake -S test -B build
+          cmake -DCMAKE_CXX_FLAGS="-D__clang__" -S test -B build
       - name: Build
         run: cmake --build build --config Release
       - name: Run

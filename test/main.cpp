@@ -296,7 +296,7 @@ void random_iterator_test()
 
 void test_utf8_iterator()
 {
-	std::string x = u8"Привет";
+	std::u8string x = u8"Привет";
 
 	util::utf8_iterator it(x.begin());
 
@@ -428,6 +428,21 @@ void test_levenshtein_distance()
 	}
 }
 
+#ifndef __clang__
+void test_literals()
+{
+	using namespace util::distance_literals;
+
+	test(1_km == 100000_cm);
+	test(1_m + 1_m == 2_m);
+	test(1_m + 1_m == 200_cm);
+	test(1_m + 2_cm == 102_cm);
+	test(1_m - 100_cm == 0_km);
+	test(1_m - 10_cm == 90_cm);
+	test(1_cm - 1_m == -99_cm);
+}
+#endif // __clang__
+
 template<typename T>
 void test_lomuto_partition_impl(std::vector<T> const& c, size_t pivot, size_t expected)
 {
@@ -490,6 +505,9 @@ int main()
 		test_levenshtein_distance();
 		test_lomuto_partition();
 		test_quick_select();
+#ifndef __clang__
+		test_literals();
+#endif // __clang__
 	}
 	catch (...)
 	{

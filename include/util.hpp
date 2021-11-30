@@ -1300,6 +1300,140 @@ uint64_t levenshtein_distance(It first1, It last1, It first2, It last2, levensht
 
     return prev_row[len2];
 }
+#ifndef __clang__
+namespace literals
+{
+template<long double U>
+struct unit
+{
+    static constexpr long double value = U;
+};
+
+template<typename T, typename Unit>
+class prefixed_value;
+
+template<typename To, typename T, typename U>
+constexpr To prefixed_value_cast(prefixed_value<T, U> const &value);
+
+template<typename T, typename Unit>
+class prefixed_value
+{
+  public:
+    using unit = Unit;
+    constexpr prefixed_value(T const &val) : val(val) {}
+    template<typename U, std::enable_if_t<U::value >= Unit::value, int> = 0>
+    constexpr prefixed_value(prefixed_value<T, U> const &pf) noexcept
+        : val(prefixed_value_cast<prefixed_value<T, Unit>>(pf).value())
+    {
+    }
+    prefixed_value operator-() const { return {-val}; }
+    constexpr T value() const { return val; }
+
+  private:
+    T val;
+};
+
+template<typename To, typename T, typename U>
+constexpr To prefixed_value_cast(prefixed_value<T, U> const &value)
+{
+    constexpr long double to_unit = To::unit::value;
+
+    if constexpr (U::value == to_unit)
+    {
+        return value;
+    }
+
+    return {static_cast<T>(value.value() * U::value / to_unit)};
+}
+
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr bool operator==(prefixed_value<T1, U1> const &l, prefixed_value<T2, U2> const &r)
+{
+    using common_type = std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>>;
+
+    return prefixed_value_cast<common_type>(l).value() == prefixed_value_cast<common_type>(r).value();
+}
+
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr bool operator!=(prefixed_value<T1, U1> const &l, prefixed_value<T2, U2> const &r)
+{
+    return !(l == r);
+}
+
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>> operator+(prefixed_value<T1, U1> const &l,
+                                                                                       prefixed_value<T2, U2> const &r)
+{
+    using return_type = std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>>;
+
+    return {prefixed_value_cast<return_type>(l).value() + prefixed_value_cast<return_type>(r).value()};
+}
+
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>> operator-(prefixed_value<T1, U1> const &l,
+                                                                                       prefixed_value<T2, U2> const &r)
+{
+    using return_type = std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>>;
+
+    return {prefixed_value_cast<return_type>(l).value() - prefixed_value_cast<return_type>(r).value()};
+}
+
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>> operator*(prefixed_value<T1, U1> const &l,
+                                                                                       prefixed_value<T2, U2> const &r)
+{
+    using return_type = std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>>;
+
+    return {prefixed_value_cast<return_type>(l).value() * prefixed_value_cast<return_type>(r).value()};
+}
+
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>> operator/(prefixed_value<T1, U1> const &l,
+                                                                                       prefixed_value<T2, U2> const &r)
+{
+    using return_type = std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>>;
+
+    return {prefixed_value_cast<return_type>(l).value() / prefixed_value_cast<return_type>(r).value()};
+}
+} // namespace literals
+
+namespace distance_literals
+{
+template<typename T, typename Unit>
+class distance : public literals::prefixed_value<T, Unit>
+{
+    using literals::prefixed_value<T, Unit>::prefixed_value;
+};
+template<typename T>
+using km = distance<T, literals::unit<1000.l>>;
+template<typename T>
+using m = distance<T, literals::unit<1.l>>;
+template<typename T>
+using cm = distance<T, literals::unit<0.01l>>;
+template<typename T>
+using mm = distance<T, literals::unit<0.001l>>;
+template<typename T>
+using mile = distance<T, literals::unit<1609.344l>>;
+
+template<typename T1, typename U1, typename T2, typename U2>
+constexpr std::common_type_t<distance<T1, U1>, distance<T2, U2>> operator*(distance<T1, U1> const &l,
+                                                                           distance<T2, U2> const &r)
+{
+    static_assert(std::is_same_v<T1, T2>, "Distances cannot be multiplied");
+}
+
+km<int64_t> operator""_km(unsigned long long x) { return km<int64_t>(x); }
+m<int64_t> operator""_m(unsigned long long x) { return m<int64_t>(x); }
+cm<int64_t> operator""_cm(unsigned long long x) { return cm<int64_t>(x); }
+mm<int64_t> operator""_mm(unsigned long long x) { return mm<int64_t>(x); }
+mile<int64_t> operator""_mile(unsigned long long x) { return mile<int64_t>(x); }
+km<long double> operator""_km(long double x) { return km<long double>(x); }
+m<long double> operator""_m(long double x) { return m<long double>(x); }
+cm<long double> operator""_cm(long double x) { return cm<long double>(x); }
+mm<long double> operator""_mm(long double x) { return mm<long double>(x); }
+mile<long double> operator""_mile(long double x) { return mile<long double>(x); }
+} // namespace distance_literals
+#endif // __clang__
 
 #ifdef _WIN32
 
