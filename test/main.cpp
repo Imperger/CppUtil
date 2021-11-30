@@ -296,7 +296,7 @@ void random_iterator_test()
 
 void test_utf8_iterator()
 {
-	std::string x = u8"Привет";
+	std::u8string x = u8"Привет";
 
 	util::utf8_iterator it(x.begin());
 
