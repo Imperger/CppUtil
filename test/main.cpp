@@ -56,25 +56,58 @@ namespace
 
 void test_max_subarray_sum()
 {
-	std::vector<int> a{ 0, 10, 2, 5, -20, 12, 9 };
-	util::max_subarray_result<std::vector<int>::iterator> r{
-		std::next(a.begin(), 5),
-		std::next(a.begin(), 7) ,
-		21 };
+	{
+		std::vector<int> a;
 
-	test(util::max_subarray_sum(a.begin(), a.end()) == r);
+		test(util::max_subarray_sum(a.begin(), a.end()) ==
+			util::max_subarray_result<std::vector<int>::iterator>{a.begin(), a.end(), 0});
+	}
+	{
+		std::vector<int> a{ 0, 10, 2, 5, -20, 12, 9 };
+		util::max_subarray_result<std::vector<int>::iterator> r{
+			std::next(a.begin(), 5),
+			std::next(a.begin(), 7) ,
+			21 };
+
+		test(util::max_subarray_sum(a.begin(), a.end()) == r);
+	}
 }
 
 void test_matrix()
 {
-	util::matrix<int64_t> m({ {3, 8}, {4, 6} });
+	{
+		util::matrix<int64_t> m({ { 1, 2 } });
 
-	test(m[0][0] == 3);
-	test(m[0][1] == 8);
-	test(m[1][0] == 4);
-	test(m[1][1] == 6);
+		try
+		{
+			m.determinant();
+			test(false);
+		}
+		catch (std::runtime_error const&)
+		{
+			test(true);
+		}
+	}
+	{
+		util::matrix<int64_t> m({ { 1 } });
 
-	test(m.determinant() == -14);
+		test(m.determinant() == m[0][0]);
+	}
+	{
+		util::matrix<int64_t> m({ {3, 8}, {4, 6} });
+
+		test(m[0][0] == 3);
+		test(m[0][1] == 8);
+		test(m[1][0] == 4);
+		test(m[1][1] == 6);
+
+		test(m.determinant() == -14);
+	}
+	{
+		util::matrix<int64_t> m({ { 6, 1, 1 }, { 4, -2, 5 }, { 2, 8, 7 } });
+
+		test(m.determinant() == -306);
+	}
 }
 
 void test_longest_common_subsequence()
@@ -85,6 +118,9 @@ void test_longest_common_subsequence()
 		std::string b;
 		std::vector<std::string::const_iterator> expect;
 	};
+
+	testcase t0{ "", "" };
+	t0.expect = { };
 
 	testcase t1{ "aava", "aaa" };
 	t1.expect = { t1.a.begin(), t1.a.begin() + 1, t1.a.begin() + 3 };
@@ -98,7 +134,7 @@ void test_longest_common_subsequence()
 		t3.a.begin() + 5,
 		t3.a.begin() + 6 };
 
-	std::vector<testcase const*> testcases{ &t1 };
+	std::vector<testcase const*> testcases{ &t0, &t1, &t2, &t3 };
 
 	for (auto const* t : testcases)
 	{
@@ -158,6 +194,16 @@ void test_queue()
 {
 	util::queue<int64_t> q;
 
+	try
+	{
+		q.front();
+		test(false);
+	}
+	catch (std::runtime_error const& e)
+	{
+		test(true);
+	}
+
 	q.push(10);
 	test(q.front() == 10);
 	test(q.back() == 10);
@@ -203,6 +249,16 @@ void test_queue()
 void test_fixed_queue()
 {
 	util::fixed_queue<int64_t, 3> q;
+
+	try
+	{
+		q.dequeue();
+		test(false);
+	}
+	catch (std::runtime_error const& e)
+	{
+		test(true);
+	}
 
 	q.enqueue(1);
 	q.enqueue(2);
@@ -271,6 +327,14 @@ void test_thread_pool()
 	test(x == 4);
 }
 
+void test_ms_to_string()
+{
+	test(util::ms_to_string(750, 2) == "750.00ms");
+	test(util::ms_to_string(6000, 2) == "6.00s");
+	test(util::ms_to_string(15 * 60 * 1000, 2) == "15.00m");
+	test(util::ms_to_string(7 * 60 * 60 * 1000, 2) == "7.00h");
+}
+
 void test_parallel_map()
 {
 	util::thread_pool p;
@@ -292,6 +356,24 @@ void random_iterator_test()
 	std::copy_n(rnd, count, std::back_inserter(x));
 
 	test(std::accumulate(x.begin(), x.end(), 0) <= max * count);
+}
+
+template<typename Gen, typename Pred>
+void random_string_test(Gen&& gen, Pred&& pred)
+{
+	{
+		test(gen(0).empty());
+
+		for (size_t length = 1; length <= 512; length <<= 1) {
+
+			for (size_t n_test = 0; n_test < 10; ++n_test)
+			{
+				auto str = gen(length);
+				test(str.size() == length && std::all_of(str.begin(), str.end(), pred));
+			}
+		}
+	}
+	return;
 }
 
 void test_utf8_iterator()
@@ -422,7 +504,7 @@ void test_levenshtein_distance()
 
 		auto result = util::levenshtein_distance(
 			a.begin(), a.end(),
-			b.begin(), b.end(), {2, 2, 1});
+			b.begin(), b.end(), { 2, 2, 1 });
 
 		test(result == 7);
 	}
@@ -472,9 +554,9 @@ void test_quick_select_impl(std::vector<T> const& c, size_t k, T expected)
 
 void test_quick_select()
 {
-	test_quick_select_impl<int>({1, 2, 3, 4, 5}, 2, 3);
-	test_quick_select_impl<int>({5, 4, 3, 2, 1}, 2, 3);
-	test_quick_select_impl<int>({2, 1, 4, 3, 8, 6}, 4, 6);
+	test_quick_select_impl<int>({ 1, 2, 3, 4, 5 }, 2, 3);
+	test_quick_select_impl<int>({ 5, 4, 3, 2, 1 }, 2, 3);
+	test_quick_select_impl<int>({ 2, 1, 4, 3, 8, 6 }, 4, 6);
 }
 
 int main()
@@ -495,8 +577,15 @@ int main()
 		test_threadsafe_queue();
 		test_threadsafe_priority_queue();
 		test_thread_pool();
+		test_ms_to_string();
 		test_parallel_map();
 		random_iterator_test();
+		random_string_test(util::random_string<std::string>::alphabet(), [](char x) {return x >= 'a' && x <= 'z'; });
+		random_string_test(util::random_string<std::wstring>::alphabet(), [](char x) {return x >= 'a' && x <= 'z'; });
+		random_string_test(util::random_string<std::string>::digits(), [](char x) {return x >= '0' && x <= '9'; });
+		random_string_test(util::random_string<std::wstring>::digits(), [](char x) {return x >= '0' && x <= '9'; });
+		random_string_test(util::random_string<std::string>::hex(), [](char x) {return (x >= '0' && x <= '9') || (x >= 'a' && x <= 'f'); });
+		random_string_test(util::random_string<std::wstring>::hex(), [](char x) {return x >= ('0' && x <= '9') || (x >= 'a' && x <= 'f'); });
 		test_utf8_iterator();
 		test_timing();
 		test_print_memory();
