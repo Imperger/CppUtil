@@ -294,6 +294,24 @@ void random_iterator_test()
 	test(std::accumulate(x.begin(), x.end(), 0) <= max * count);
 }
 
+template<typename Gen, typename Pred>
+void random_string_test(Gen&& gen, Pred&& pred)
+{
+	{
+		test(gen(0).empty());
+
+		for (size_t length = 1; length <= 512; length <<= 1) {
+
+			for (size_t n_test = 0; n_test < 10; ++n_test)
+			{
+				auto str = gen(length);
+				test(str.size() == length && std::all_of(str.begin(), str.end(), pred));
+			}
+		}
+	}
+	return;
+}
+
 void test_utf8_iterator()
 {
 	std::u8string x = u8"Привет";
@@ -497,6 +515,12 @@ int main()
 		test_thread_pool();
 		test_parallel_map();
 		random_iterator_test();
+		random_string_test(util::random_string<std::string>::alphabet(), [](char x) {return x >= 'a' && x <= 'z'; });
+		random_string_test(util::random_string<std::wstring>::alphabet(), [](char x) {return x >= 'a' && x <= 'z'; });
+		random_string_test(util::random_string<std::string>::digits(), [](char x) {return x >= '0' && x <= '9'; });
+		random_string_test(util::random_string<std::wstring>::digits(), [](char x) {return x >= '0' && x <= '9'; });
+		random_string_test(util::random_string<std::string>::hex(), [](char x) {return (x >= '0' && x <= '9') || (x >= 'a' && x <= 'f'); });
+		random_string_test(util::random_string<std::wstring>::hex(), [](char x) {return x >= ('0' && x <= '9') || (x >= 'a' && x <= 'f'); });
 		test_utf8_iterator();
 		test_timing();
 		test_print_memory();
