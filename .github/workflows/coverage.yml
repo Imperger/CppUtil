@@ -15,7 +15,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt-get purge gcc g++
-          sudo apt install gcc-11 g++-11
+          sudo apt install gcc-11 g++-11 lcov
           sudo ln -f -s /usr/bin/gcc-11 /usr/bin/gcc
           sudo ln -f -s /usr/bin/g++-11 /usr/bin/g++
           sudo ln -f -s /usr/bin/gcov-11 /usr/bin/gcov
@@ -29,7 +29,8 @@ jobs:
         run: |
           cd build
           ./CppUtilTest
-          gcov --verbose ./CMakeFiles/CppUtilTest.dir/main.cpp.gcno
+          lcov --directory . --capture --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' --output-file coverage.info
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
