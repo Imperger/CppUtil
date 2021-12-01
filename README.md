@@ -1,5 +1,6 @@
 # CppUtil
 
+[![codecov](https://codecov.io/gh/Imperger/CppUtil/branch/main/graph/badge.svg?token=LSB7QWSZ41)](https://codecov.io/gh/Imperger/CppUtil)
 ## mean
 ```cpp
 template<typename It>

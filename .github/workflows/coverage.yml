@@ -1,0 +1,36 @@
+name: Gcc
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Coverage
+    runs-on: "ubuntu-latest"
+    env:
+      cc: gcc
+      cxx: g++
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install gcc
+        run: |
+          sudo apt update
+          sudo apt-get purge gcc g++
+          sudo apt install gcc-11 g++-11
+          sudo ln -f -s /usr/bin/gcc-11 /usr/bin/gcc
+          sudo ln -f -s /usr/bin/g++-11 /usr/bin/g++
+          sudo ln -f -s /usr/bin/gcov-11 /usr/bin/gcov
+      - name: Configure
+        run: |
+          mkdir build
+          cmake -DCMAKE_CXX_FLAGS="-g -O0 -Wall -fprofile-arcs -ftest-coverage" -S test -B build
+      - name: Build
+        run: cmake --build build --config Debug
+      - name: Generate report
+        run: |
+          cd build
+          ./CppUtilTest
+          gcov --verbose ./CMakeFiles/CppUtilTest.dir/main.cpp.gcno
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          verbose: true
