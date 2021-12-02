@@ -311,20 +311,42 @@ void test_threadsafe_priority_queue()
 
 void test_thread_pool()
 {
-	util::thread_pool p;
-	util::task_package t;
+	{
+		util::thread_pool p;
+		util::task_package t;
 
-	std::atomic<int64_t> x = 0;
+		std::atomic<int64_t> x = 0;
 
-	t.append([&] { ++x; });
-	t.append([&] { ++x; });
-	t.append([&] { ++x; });
-	t.append([&] { ++x; });
+		t.append([&] { ++x; });
+		t.append([&] { ++x; });
+		t.append([&] { ++x; });
+		t.append([&] { ++x; });
 
-	p.schedule(t);
-	t.wait();
+		p.schedule(t);
+		t.wait();
 
-	test(x == 4);
+		test(x == 4);
+	}
+
+	{
+		util::thread_pool p;
+		util::task_package t;
+
+		t.append([]() {});
+		p.schedule(t);
+
+		try
+		{
+			t.append([]() {});
+			test(false);
+		}
+		catch (std::runtime_error const& e)
+		{
+			test(true);
+		}
+
+		t.wait();
+	}
 }
 
 void test_ms_to_string()
@@ -348,14 +370,25 @@ void test_parallel_map()
 
 void random_iterator_test()
 {
-	const int64_t max = 10;
-	const uint64_t count = 10;
-	util::random_int_iterator rnd(0, max);
+	{
 
-	std::vector<int64_t> x;
-	std::copy_n(rnd, count, std::back_inserter(x));
+		const int64_t max = 10;
+		const uint64_t count = 10;
+		util::random_int_iterator rnd(0, max);
 
-	test(std::accumulate(x.begin(), x.end(), 0) <= max * count);
+		std::vector<int64_t> x;
+		std::copy_n(rnd, count, std::back_inserter(x));
+
+		test(std::accumulate(x.begin(), x.end(), 0) <= max * count);
+	}
+	{
+		util::random_int_iterator rnd(0, 100);
+
+		auto r0 = *rnd;
+		auto r1 = *rnd++;
+
+		test(r0 == r1);
+	}
 }
 
 template<typename Gen, typename Pred>
@@ -378,16 +411,37 @@ void random_string_test(Gen&& gen, Pred&& pred)
 
 void test_utf8_iterator()
 {
-	std::u8string x = u8"Привет";
+	{
+		std::u8string x = u8"abc";
 
-	util::utf8_iterator it(x.begin());
+		util::utf8_iterator it(x.begin());
 
-	test(*it == *L"П");
-	test(*++it == *L"р");
-	test(*++it == *L"и");
-	test(*++it == *L"в");
-	test(*++it == *L"е");
-	test(*++it == *L"т");
+		test(*it == L'a');
+		test(*++it == L'b');
+		test(*++it == L'c');
+	}
+	{
+
+		std::u8string x = u8"Привет";
+
+		util::utf8_iterator it(x.begin());
+
+		test(*it == L'П');
+		test(*++it == L'р');
+		test(*++it == L'и');
+		test(*++it == L'в');
+		test(*++it == L'е');
+		test(*++it == L'т');
+	}
+	{
+		std::u8string x = u8"诶比西";
+
+		util::utf8_iterator it(x.begin());
+
+		test(*it == L'诶');
+		test(*++it == L'比');
+		test(*++it == L'西');
+	}
 }
 
 void test_timing()
@@ -411,12 +465,22 @@ void test_timing()
 
 void test_print_memory()
 {
-	std::string x = "1234567890";
+	std::string x = "1234567890abcdefghijklmnopqrstuvwxyz";
 	std::stringstream ss;
+	const util::PrintOptions options = { 16, true, true, '.' };
 
-	util::print_memory(x.data(), 10, ss, { 16, false, true, '.' });
-	auto ll = ss.str();
-	test(ss.str() == "31 32 33 34 35 36 37 38 39 30                    1234567890");
+	util::print_memory(x.data(), x.size(), ss, options);
+	std::stringstream expect;
+	const size_t char_size = 3;
+	const size_t hex_scale = 2;
+	const size_t pad = (options.width * char_size - sizeof(uintptr_t) * hex_scale) / 2;
+
+	expect << std::setfill(' ') << std::setw(pad + sizeof(uintptr_t) * hex_scale) << static_cast<const void*>(x.data()) << '\n';
+	expect << "31 32 33 34 35 36 37 38 39 30 61 62 63 64 65 66  1234567890abcdef\n"
+		"67 68 69 6a 6b 6c 6d 6e 6f 70 71 72 73 74 75 76  ghijklmnopqrstuv\n"
+		"77 78 79 7a                                      wxyz";
+
+	test(ss.str() == expect.str());
 }
 
 template<typename T>
