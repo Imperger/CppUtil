@@ -586,6 +586,20 @@ void test_literals()
 	test(1_m - 100_cm == 0_km);
 	test(1_m - 10_cm == 90_cm);
 	test(1_cm - 1_m == -99_cm);
+	test(10_mm == 1_cm);
+	test(1._mile <= 1.7_km);
+	test(1_m != 1_cm);
+
+	test(1._km == 100000._cm);
+	test(1._m + 1._m == 2._m);
+	test(1._m + 1._m == 200._cm);
+	test(1._m + 2._cm == 102._cm);
+	test(1._m - 100._cm == 0._km);
+	test(1._m - 10._cm == 90._cm);
+	test(1._cm - 1._m == -99._cm);
+	test(10._mm == 1._cm);
+	test(1._mile <= 1.7_km);
+	test(1._m != 1._cm);
 }
 #endif // __clang__
 
