@@ -1361,6 +1361,14 @@ constexpr bool operator!=(prefixed_value<T1, U1> const &l, prefixed_value<T2, U2
 }
 
 template<typename T1, typename U1, typename T2, typename U2>
+constexpr std::partial_ordering operator<=>(prefixed_value<T1, U1> const &l, prefixed_value<T2, U2> const &r)
+{
+    using common_type = std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>>;
+
+    return prefixed_value_cast<common_type>(l).value() <=> prefixed_value_cast<common_type>(r).value();
+}
+
+template<typename T1, typename U1, typename T2, typename U2>
 constexpr std::common_type_t<prefixed_value<T1, U1>, prefixed_value<T2, U2>> operator+(prefixed_value<T1, U1> const &l,
                                                                                        prefixed_value<T2, U2> const &r)
 {
