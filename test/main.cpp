@@ -152,11 +152,14 @@ void test_longest_common_substring()
 		std::pair<std::string::const_iterator, std::string::const_iterator> expect;
 	};
 
+	testcase t0{ "", "" };
+	t0.expect = std::make_pair(t0.a.end(), t0.a.end());
+
 	testcase t1{ "aava", "aaa" };
 	t1.expect = std::make_pair(t1.a.begin(), t1.a.begin() + 2);
 
 	testcase t2{ "aaa", "aava" };
-	t2.expect = std::make_pair(t2.a.begin(), t2.a.begin() + 2);
+	t2.expect = std::make_pair(t2.a.begin() + 1, t2.a.end());
 
 	testcase t3{ "abcdef", "bcdf" };
 	t3.expect = std::make_pair(t3.a.begin() + 1, t3.a.begin() + 4);
@@ -165,7 +168,10 @@ void test_longest_common_substring()
 	testcase t4{ "abcdefg", "bcfg" };
 	t4.expect = std::make_pair(t4.a.begin() + 5, t4.a.begin() + 7);
 
-	std::vector<testcase const*> testcases{ &t1 };
+	testcase t5{ "abcdefg", "123" };
+	t5.expect = std::make_pair(t5.a.end(), t5.a.end());
+
+	std::vector<testcase const*> testcases{ &t0, &t1, &t2, &t3, &t4, &t5 };
 
 	for (auto const* t : testcases)
 	{
