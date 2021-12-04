@@ -587,7 +587,7 @@ void test_literals()
 	test(1_m - 10_cm == 90_cm);
 	test(1_cm - 1_m == -99_cm);
 	test(10_mm == 1_cm);
-	test(1._mile <= 1.7_km);
+	test(1_mile < 2_km);
 	test(1_m != 1_cm);
 
 	test(1._km == 100000._cm);
