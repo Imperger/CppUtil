@@ -285,7 +285,7 @@ std::pair<RndIt1, RndIt1> longest_common_substring(RndIt1 first1, RndIt1 last1, 
     assert(length2 >= 0 && "Negative input2 length");
 
     if (!(length1 && length2))
-        return {};
+        return {last1, last1};
 
     matrix<int64_t> lens(length1 + 1, length2 + 1);
     int64_t max_len = 0;
