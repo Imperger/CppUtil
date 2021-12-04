@@ -126,7 +126,7 @@ void test_longest_common_subsequence()
 	t1.expect = { t1.a.begin(), t1.a.begin() + 1, t1.a.begin() + 3 };
 
 	testcase t2{ "aaa", "aava" };
-	t2.expect = { t2.a.begin(), t2.a.begin() + 1, t2.a.begin() + 2 };
+	t2.expect = std::make_pair(t2.a.begin() + 1, t2.a.end());
 
 	testcase t3{ "abcdefg", "bcfg" };
 	t3.expect = { t3.a.begin() + 1,
