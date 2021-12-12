@@ -618,6 +618,45 @@ void test_lomuto_partition_impl(std::vector<T> const& c, size_t pivot, size_t ex
 	test(it == t.begin() + expected);
 }
 
+namespace
+{
+template<typename T>
+struct Testcase
+{
+    std::vector<T> in;
+    std::string expected;
+};
+
+void test_print_container()
+{
+    using util::operator<<;
+
+    Testcase<int64_t> long_testcase{std::vector<int64_t>(PRINT_LENGTH_LIMIT + 1), ""};
+
+    long_testcase.expected = "[";
+    for (size_t n = 0; n < long_testcase.in.size(); ++n)
+    {
+        long_testcase.in[n] = n;
+
+        if (n < PRINT_LENGTH_LIMIT - 1)
+        {
+            long_testcase.expected.append(std::to_string(n) + ", ");
+        }
+    }
+    long_testcase.expected.append("..., " + std::to_string(long_testcase.in.size() - 1) + "]");
+
+    std::vector<Testcase<int64_t>> tests{{{}, "[]"}, {{1, 2, 3}, "[1, 2, 3]"}, long_testcase};
+
+    for (auto const &test : tests)
+    {
+        std::stringstream ss;
+        ss << test.in;
+
+        ::test(ss.str() == test.expected);
+    }
+}
+} // namespace
+
 void test_lomuto_partition()
 {
 	test_lomuto_partition_impl<int>({ 2, 4, 7, 1, 0, 3 }, 5, 3);
@@ -676,6 +715,7 @@ int main()
 		test_merge();
 		test_merge_sort();
 		test_levenshtein_distance();
+        test_print_container();
 		test_lomuto_partition();
 		test_quick_select();
 #ifndef __clang__
